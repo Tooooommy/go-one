@@ -230,9 +230,8 @@ func (b *TokenBuilder) WithTimeout(timeout time.Duration) BuildOption {
 	}
 }
 
-func (b *TokenBuilder) BuildToken() (string, error) {
-	var token string
-	var err error
-
-	return token, err
+func (b *TokenBuilder) BuildToken(claims jwt.Claims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenStr, err := token.SignedString(b.secret)
+	return tokenStr, err
 }
