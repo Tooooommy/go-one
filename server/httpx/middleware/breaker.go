@@ -56,7 +56,7 @@ func SonyTowStepBreaker(config BreakerConfig) func(http.Handler) http.Handler {
 			if err != nil {
 				http.Error(w, ErrRequestBreaker.Error(), http.StatusServiceUnavailable)
 			}
-			wx := &x.ResponseWriterX{Writer: w}
+			wx := &x.CodeResponseWriter{Writer: w}
 			defer func() {
 				if wx.Code >= http.StatusInternalServerError {
 					promise(false)
@@ -73,7 +73,7 @@ func SonyBreaker(config BreakerConfig) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := breaker.Execute(func() (interface{}, error) {
 				var err error
-				wx := &x.ResponseWriterX{Writer: w}
+				wx := &x.CodeResponseWriter{Writer: w}
 				defer func() {
 					if wx.Code >= http.StatusInternalServerError {
 						err = ErrRequestBreaker
@@ -94,7 +94,7 @@ func HystrixBreaker(config BreakerConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			err := hystrix.Do(config.BreakerName, func() error {
-				wx := &x.ResponseWriterX{Writer: w}
+				wx := &x.CodeResponseWriter{Writer: w}
 				var err error
 				defer func() {
 					if wx.Code >= http.StatusInternalServerError {
