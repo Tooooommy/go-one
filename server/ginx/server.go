@@ -11,11 +11,13 @@ var (
 	Name = "go-one"
 )
 
+// Server
 type Server struct {
 	eng *gin.Engine
 	cfg config.HttpConfig
 }
 
+// ServerOption
 type ServerOption func(s *Server)
 
 // NewServer: 实例化Server
@@ -48,7 +50,7 @@ func WithConfig(cfg config.HttpConfig) ServerOption {
 	}
 }
 
-// GinEngine: 获取gin.Engine
+// Engine: 获取gin.Engine
 func (s *Server) Engine() *gin.Engine {
 	return s.eng
 }

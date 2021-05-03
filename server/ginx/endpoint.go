@@ -7,11 +7,15 @@ import (
 	"mime/multipart"
 )
 
+var ErrFileHeaderInvalid = errors.New("file header is invalid")
+
 type JSONResponse struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
 }
+
+type FileEndpoint func(ctx context.Context, fs ...*multipart.FileHeader) (*JSONResponse, error)
 
 type JSONEndpoint func(ctx context.Context, request interface{}) (*JSONResponse, error)
 
@@ -20,10 +24,6 @@ func JSONToEndpoint(e JSONEndpoint) endpoint.Endpoint {
 		return e(ctx, request)
 	}
 }
-
-var ErrFileHeaderInvalid = errors.New("file header is invalid")
-
-type FileEndpoint func(ctx context.Context, fs ...*multipart.FileHeader) (*JSONResponse, error)
 
 func FileToEndpoint(e FileEndpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
