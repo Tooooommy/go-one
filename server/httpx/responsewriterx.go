@@ -1,6 +1,6 @@
 /// copy from go-zero
 
-package x
+package httpx
 
 import (
 	"bufio"

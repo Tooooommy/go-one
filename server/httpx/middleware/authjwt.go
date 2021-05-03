@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"godot/server/httpx/x"
+	"github.com/Tooooommy/go-one/server/httpx"
 	"net/http"
 )
 
 // 可以校验时间、校验ip、校验设备
-func AuthJwt(secret, preSecret string, opts ...x.ParseOption) func(http.Handler) http.Handler {
-	parser := x.NewTokenParser(x.TokenConfig{
+func AuthJwt(secret, preSecret string, opts ...httpx.ParseOption) func(http.Handler) http.Handler {
+	parser := httpx.NewTokenParser(httpx.TokenConfig{
 		Secret:    secret,
 		PreSecret: preSecret,
 	}, opts...)

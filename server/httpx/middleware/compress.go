@@ -11,7 +11,7 @@ const (
 	gunzip          = "zip"
 )
 
-func GzipHandler(next http.Handler) http.Handler {
+func GzipHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.Header.Get(contentEncoding), gunzip) {
 			reader, err := gzip.NewReader(r.Body)
@@ -21,6 +21,5 @@ func GzipHandler(next http.Handler) http.Handler {
 			}
 			r.Body = reader
 		}
-		next.ServeHTTP(w, r)
 	})
 }

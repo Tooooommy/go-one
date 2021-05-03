@@ -1,4 +1,4 @@
-package x
+package httpx
 
 import (
 	"context"
@@ -16,16 +16,18 @@ from go-zero
 */
 
 const (
-	jwtAudience  = "aud"
-	jwtExpire    = "exp"
-	jwtId        = "jti"
-	jwtIssueAt   = "iat"
-	jwtIssuer    = "iss"
-	jwtNotBefore = "nbf"
-	jwtSubject   = "sub"
-	jwtRealIp    = "rip"
-	jwtDevice    = "dvc"
-	JwtAuthToken = "JWT_AUTH_TOKEN" // TOKEN
+	jwtAudience     = "aud"
+	jwtExpire       = "exp"
+	jwtId           = "jti"
+	jwtIssueAt      = "iat"
+	jwtIssuer       = "iss"
+	jwtNotBefore    = "nbf"
+	jwtSubject      = "sub"
+	jwtRealIp       = "rip"
+	jwtDevice       = "dvc"
+	JwtAuthToken    = "JWT_AUTH_TOKEN" // TOKEN
+	JwtRealIp       = "JWT_REAL_IP"
+	JwtClientDevice = "JWT_CLIENT_DEVICE"
 )
 
 var (
@@ -133,11 +135,11 @@ func (p *TokenParser) ParseToken(r *http.Request) (*jwt.Token, error) {
 		return nil, err
 	}
 
-	if err = p.VerifyRealIp(r.RemoteAddr, claims); err != nil {
+	if err = p.VerifyRealIp(ctx.Value(JwtRealIp), claims); err != nil {
 		return nil, err
 	}
 
-	if err = p.VerifyDevice(r.UserAgent(), claims); err != nil {
+	if err = p.VerifyClientDevice(ctx.Value(JwtClientDevice), claims); err != nil {
 		return nil, err
 	}
 
@@ -153,7 +155,7 @@ func (p *TokenParser) ParseToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-func (p *TokenParser) VerifyDevice(device string, claims jwt.MapClaims) error {
+func (p *TokenParser) VerifyClientDevice(device interface{}, claims jwt.MapClaims) error {
 	if p.validDevice {
 		if vDevice, ok := claims[jwtDevice]; ok && device == vDevice {
 			return nil
@@ -164,7 +166,7 @@ func (p *TokenParser) VerifyDevice(device string, claims jwt.MapClaims) error {
 	return nil
 }
 
-func (p *TokenParser) VerifyRealIp(rip string, claims jwt.MapClaims) error {
+func (p *TokenParser) VerifyRealIp(rip interface{}, claims jwt.MapClaims) error {
 	if p.validRealIp {
 		if vip, ok := claims[jwtRealIp]; ok && rip == vip {
 			return nil

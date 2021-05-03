@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func CrossOrigins(origins ...string) func(http.Handler) http.Handler {
+func CrossOrigins(origins ...string) http.Handler {
 	options := cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{
@@ -22,5 +22,5 @@ func CrossOrigins(origins ...string) func(http.Handler) http.Handler {
 	if len(origins) > 0 {
 		options.AllowedOrigins = origins
 	}
-	return cors.New(options).Handler
+	return http.HandlerFunc(cors.New(options).HandlerFunc)
 }

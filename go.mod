@@ -1,12 +1,13 @@
-module godot
+module github.com/Tooooommy/go-one
 
-go 1.15
+go 1.16
 
 require (
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-chi/chi/v5 v5.0.2
+	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
