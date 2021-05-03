@@ -7,6 +7,11 @@ import (
 	"net/http"
 )
 
+// Default value
+var (
+	Name = "go-one"
+)
+
 type Server struct {
 	eng *gin.Engine
 	cfg config.HttpConfig
@@ -19,12 +24,9 @@ func NewServer(options ...ServerOption) *Server {
 	s := &Server{
 		eng: gin.New(),
 		cfg: config.HttpConfig{
-			Host:         "127.0.0.1",
-			Port:         9091,
-			MaxConns:     0,
-			MaxBytes:     0,
-			Timeout:      0,
-			CpuThreshold: 0,
+			Name: Name,
+			Host: "127.0.0.1",
+			Port: 9091,
 		},
 	}
 	for _, opt := range options {
