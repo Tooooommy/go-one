@@ -9,14 +9,41 @@ import (
 
 type Server struct {
 	eng *gin.Engine
-	cfg *config.HttpConfig
+	cfg config.HttpConfig
 }
 
+type ServerOption func(s *Server)
+
 // NewServer: 实例化Server
-func NewServer(config *config.HttpConfig) *Server {
-	return &Server{
+func NewServer(options ...ServerOption) *Server {
+	s := &Server{
 		eng: gin.New(),
-		cfg: config,
+		cfg: config.HttpConfig{
+			Host:         "127.0.0.1",
+			Port:         9091,
+			MaxConns:     0,
+			MaxBytes:     0,
+			Timeout:      0,
+			CpuThreshold: 0,
+		},
+	}
+	for _, opt := range options {
+		opt(s)
+	}
+	return s
+}
+
+// WithGinEngine: 设置GinEngine
+func WithGinEngine(eng *gin.Engine) ServerOption {
+	return func(s *Server) {
+		s.eng = eng
+	}
+}
+
+// WithConfig: 设置Config
+func WithConfig(cfg config.HttpConfig) ServerOption {
+	return func(s *Server) {
+		s.cfg = cfg
 	}
 }
 
@@ -26,7 +53,7 @@ func (s *Server) GinEngine() *gin.Engine {
 }
 
 // Config: 获取config.HttpConfig配置
-func (s *Server) Config() *config.HttpConfig {
+func (s *Server) Config() config.HttpConfig {
 	return s.cfg
 }
 
