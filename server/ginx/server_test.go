@@ -1,6 +1,7 @@
 package ginx
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"testing"
@@ -8,7 +9,14 @@ import (
 
 func TestT(t *testing.T) {
 	router := gin.New()
-	router.Any("/", func(ctx *gin.Context) {
+	router.Any("/test", func(ctx *gin.Context) {
+		fmt.Printf("%+v\n", ctx.Params)
+		ctx.JSON(http.StatusOK, gin.H{
+			"hello": "world",
+		})
+	})
+	router.Any("/param/:id", func(ctx *gin.Context) {
+		fmt.Printf("%+v\n", ctx.Params)
 		ctx.JSON(http.StatusOK, gin.H{
 			"hello": "world",
 		})

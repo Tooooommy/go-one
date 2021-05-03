@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/Tooooommy/go-one/server/config"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // Default value
@@ -50,7 +49,7 @@ func WithConfig(cfg config.HttpConfig) ServerOption {
 }
 
 // GinEngine: 获取gin.Engine
-func (s *Server) GinEngine() *gin.Engine {
+func (s *Server) Engine() *gin.Engine {
 	return s.eng
 }
 
@@ -67,17 +66,4 @@ func (s *Server) Start() error {
 	} else {
 		return s.eng.RunTLS(addr, s.cfg.CertFile, s.cfg.KeyFile)
 	}
-}
-
-// ServeHTTP: 实现HTTP Serve
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.eng.ServeHTTP(w, r)
-}
-
-func wrapHs(handlers ...http.Handler) gin.HandlersChain {
-	var chain gin.HandlersChain
-	for _, handler := range handlers {
-		chain = append(chain, gin.WrapH(handler))
-	}
-	return chain
 }
