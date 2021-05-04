@@ -59,5 +59,3 @@ func Timeout(duration time.Duration) gin.HandlerFunc {
 		}
 	}
 }
-
-// MaxConns: 最大连接
