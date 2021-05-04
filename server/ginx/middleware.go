@@ -3,8 +3,10 @@ package ginx
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -57,5 +59,38 @@ func Timeout(duration time.Duration) gin.HandlerFunc {
 				TimeoutReason,
 			).ServeHTTP(c.Writer, c.Request)
 		}
+	}
+}
+
+// RequestId: 生成唯一值
+func RequestId() gin.HandlerFunc {
+	return requestid.New()
+}
+
+var xForwardedFor = http.CanonicalHeaderKey("X-Forwarded-For")
+var xRealIP = http.CanonicalHeaderKey("X-Real-IP")
+
+// GetRealIp: 获取真实IP
+func RealIp() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ip := c.Request.Header.Get(xRealIP)
+		if ip == "" {
+			if xff := c.Request.Header.Get(xForwardedFor); xff != "" {
+				i := strings.Index(xff, ", ")
+				if i == -1 {
+					i = len(xff)
+				}
+				ip = xff[:i]
+			}
+		}
+		c.Request.RemoteAddr = ip
+		c.Next()
+	}
+}
+
+// Recovery: panic恢复
+func Recovery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
 	}
 }
