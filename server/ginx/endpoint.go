@@ -19,12 +19,14 @@ type FileEndpoint func(ctx context.Context, fs ...*multipart.FileHeader) (*JSONR
 
 type JSONEndpoint func(ctx context.Context, request interface{}) (*JSONResponse, error)
 
-func JSONToEndpoint(e JSONEndpoint) endpoint.Endpoint {
+// JsonToEndpoint
+func JsonToEndpoint(e JSONEndpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		return e(ctx, request)
 	}
 }
 
+// FileToEndpoint
 func FileToEndpoint(e FileEndpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		fs, ok := request.([]*multipart.FileHeader)

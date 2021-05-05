@@ -1,14 +1,25 @@
 package ginx
 
 import (
+	"github.com/Tooooommy/go-one/core/logx"
+	"github.com/Tooooommy/go-one/core/metrics"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	kitopentracing "github.com/go-kit/kit/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
+
+func Nop() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+	}
+}
 
 // Cors: 跨域请求
 func Cors(origins ...string) gin.HandlerFunc {
@@ -91,6 +102,47 @@ func RealIp() gin.HandlerFunc {
 // Recovery: panic恢复
 func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		defer func() {
+			err := recover()
+			logx.Error().Any("Recovery Error: %+v", err).Msg("GIN HTTP Panic")
+			c.AbortWithStatus(http.StatusInternalServerError)
+		}()
 		c.Next()
 	}
+}
+
+// StartTracing: 开启链路追踪
+func StartTracing(name string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if len(name) > 0 {
+			rf := kitopentracing.ContextToHTTP(opentracing.GlobalTracer(), logx.KitL())
+			ctx := c.Request.Context()
+			span := opentracing.SpanFromContext(ctx)
+			if span == nil {
+				span = opentracing.GlobalTracer().StartSpan(name)
+				defer span.Finish()
+			}
+			ctx = opentracing.ContextWithSpan(ctx, span)
+			c.Request = c.Request.WithContext(rf(ctx, c.Request))
+		}
+		c.Next()
+	}
+}
+
+// StartPromxMetrics: 开启开启普罗米修斯
+func StartPromxMetrics(cfg metrics.Config) gin.HandlerFunc {
+	if len(cfg.Name) != 0 || len(cfg.Namespace) != 0 || len(cfg.Subsystem) != 0 {
+		counter := metrics.NewPromxCounter(cfg)
+		histogram := metrics.NewPromxHistogram(cfg)
+		return func(c *gin.Context) {
+			n := time.Now()
+			defer func() {
+				labels := []string{c.Request.Method, c.Request.Method, strconv.Itoa(c.Writer.Status())}
+				counter.With(labels...).Add(1)
+				histogram.With(labels...).Observe(float64(time.Since(n).Milliseconds()))
+			}()
+			c.Next()
+		}
+	}
+	return Nop()
 }

@@ -1,4 +1,4 @@
-package config
+package conf
 
 type JwtConfig struct {
 	Secret      string `json:"secret"`

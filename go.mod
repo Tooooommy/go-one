@@ -16,10 +16,14 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/prometheus/client_golang v1.10.0 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/sony/gobreaker v0.4.1
 	github.com/spf13/cobra v1.1.3
 	github.com/streadway/handy v0.0.0-20190108123426-d5acb3125c2a
+	github.com/uber/jaeger-client-go v2.28.0+incompatible // indirect
+	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/ugorji/go v1.2.5 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/ratelimit v0.2.0

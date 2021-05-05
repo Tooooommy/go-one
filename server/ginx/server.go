@@ -2,7 +2,7 @@ package ginx
 
 import (
 	"fmt"
-	"github.com/Tooooommy/go-one/server/config"
+	"github.com/Tooooommy/go-one/server/conf"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ var (
 // Server
 type Server struct {
 	eng *gin.Engine
-	cfg config.HttpConfig
+	cfg conf.HttpConfig
 }
 
 // ServerOption
@@ -24,7 +24,7 @@ type ServerOption func(s *Server)
 func NewServer(options ...ServerOption) *Server {
 	s := &Server{
 		eng: gin.New(),
-		cfg: config.HttpConfig{
+		cfg: conf.HttpConfig{
 			Name: Name,
 			Host: "127.0.0.1",
 			Port: 9091,
@@ -44,7 +44,7 @@ func WithGinEngine(eng *gin.Engine) ServerOption {
 }
 
 // WithConfig: 设置Config
-func WithConfig(cfg config.HttpConfig) ServerOption {
+func WithConfig(cfg conf.HttpConfig) ServerOption {
 	return func(s *Server) {
 		s.cfg = cfg
 	}
@@ -56,7 +56,7 @@ func (s *Server) Engine() *gin.Engine {
 }
 
 // Config: 获取config.HttpConfig配置
-func (s *Server) Config() config.HttpConfig {
+func (s *Server) Config() conf.HttpConfig {
 	return s.cfg
 }
 

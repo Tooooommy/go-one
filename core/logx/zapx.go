@@ -1,6 +1,8 @@
 package logx
 
 import (
+	"github.com/go-kit/kit/log"
+	kitlog "github.com/go-kit/kit/log/zap"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -80,11 +82,15 @@ func SetElkMode(cfg ElkModeConfig) Option {
 	}
 }
 
-func Logger() *zap.Logger {
+func KitL() log.Logger {
+	return kitlog.NewZapSugarLogger(_zapx.log, zapcore.Level(_zapx.cfg.Level))
+}
+
+func L() *zap.Logger {
 	return _zapx.log
 }
 
-func Suger() *zap.SugaredLogger {
+func S() *zap.SugaredLogger {
 	return _zapx.sug
 }
 

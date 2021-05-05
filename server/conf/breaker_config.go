@@ -1,4 +1,4 @@
-package config
+package conf
 
 type BreakerConfig struct {
 	Name            string `json:"name"`              // 熔断名字

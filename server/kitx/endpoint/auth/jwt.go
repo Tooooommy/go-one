@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
-	"github.com/Tooooommy/go-one/server/config"
+	"github.com/Tooooommy/go-one/server/conf"
 	"github.com/dgrijalva/jwt-go"
 	kitjwt "github.com/go-kit/kit/auth/jwt"
 	"github.com/go-kit/kit/endpoint"
@@ -39,12 +39,12 @@ const (
 )
 
 // NewJwtParser: 解析JWT数据
-func NewJwtParser(cfg config.JwtConfig) endpoint.Middleware {
+func NewJwtParser(cfg conf.JwtConfig) endpoint.Middleware {
 	return parse([]byte(cfg.Secret), cfg.ValidRealIp, cfg.ValidDevice)
 }
 
 // NewJwtSigner: 生成JWTTOken
-func NewJwtSigner(cfg config.JwtConfig) endpoint.Middleware {
+func NewJwtSigner(cfg conf.JwtConfig) endpoint.Middleware {
 	timeout := cfg.Timeout
 	if timeout <= 0 {
 		timeout = 24
@@ -59,7 +59,7 @@ func buildClaims(claims jwt.MapClaims, key string, val interface{}) {
 }
 
 // NewJwtReSigner: 重新签发JWTToken, 修改secret
-func NewJwtReSigner(cfg config.JwtConfig) endpoint.Middleware {
+func NewJwtReSigner(cfg conf.JwtConfig) endpoint.Middleware {
 	timeout := cfg.Timeout
 	if timeout <= 0 {
 		timeout = 24

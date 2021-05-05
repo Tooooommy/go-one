@@ -1,4 +1,4 @@
-package config
+package conf
 
 type HttpConfig struct {
 	Name         string `json:"name"`

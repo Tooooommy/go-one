@@ -58,7 +58,7 @@ func (s *Transport) NoHandler(e endpoint.Endpoint) gin.HandlerFunc {
 
 // JSONHandler
 func (s *Transport) JSONHandler(e JSONEndpoint, response interface{}) gin.HandlerFunc {
-	return s.Handler(JSONToEndpoint(e), response, JSONDecoder, JSONEncoder)
+	return s.Handler(JsonToEndpoint(e), response, JSONDecoder, JSONEncoder)
 }
 
 // FileHandler
