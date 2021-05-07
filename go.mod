@@ -12,6 +12,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-kit/kit v0.10.0
 	github.com/go-playground/validator/v10 v10.4.2 // indirect
+	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.2.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
@@ -32,6 +33,6 @@ require (
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	google.golang.org/genproto v0.0.0-20210505142820-a42aa055cf76 // indirect
-	google.golang.org/grpc v1.37.0 // indirect
+	google.golang.org/grpc v1.37.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )

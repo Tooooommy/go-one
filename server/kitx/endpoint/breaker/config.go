@@ -1,6 +1,6 @@
-package conf
+package breaker
 
-type BreakerConfig struct {
+type Config struct {
 	Name            string `json:"name"`              // 熔断名字
 	Timeout         int    `json:"timeout"`           // 请求超时时间
 	MaxRequests     int    `json:"max_requests"`      // 最大并发请求

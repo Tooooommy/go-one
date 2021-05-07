@@ -2,14 +2,13 @@ package breaker
 
 import (
 	"github.com/Tooooommy/go-one/core/logx"
-	"github.com/Tooooommy/go-one/server/conf"
 	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/sony/gobreaker"
 	"time"
 )
 
-func wrapGoBreakerSettings(cfg conf.BreakerConfig) gobreaker.Settings {
+func wrapGoBreakerSettings(cfg Config) gobreaker.Settings {
 	return gobreaker.Settings{
 		Name:        cfg.Name,
 		MaxRequests: uint32(cfg.MaxRequests),
@@ -36,7 +35,7 @@ func readyToTrip(errPerThreshold int) func(counts gobreaker.Counts) bool {
 	return nil
 }
 
-func GoBreaker(cfg conf.BreakerConfig) endpoint.Middleware {
+func GoBreaker(cfg Config) endpoint.Middleware {
 	breaker := gobreaker.NewCircuitBreaker(wrapGoBreakerSettings(cfg))
 	return circuitbreaker.Gobreaker(breaker)
 }

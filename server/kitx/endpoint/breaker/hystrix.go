@@ -1,13 +1,12 @@
 package breaker
 
 import (
-	"github.com/Tooooommy/go-one/server/conf"
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
 )
 
-func wrapHystrxConfig(cfg conf.BreakerConfig) hystrix.CommandConfig {
+func wrapHystrxConfig(cfg Config) hystrix.CommandConfig {
 	return hystrix.CommandConfig{
 		Timeout:                cfg.Timeout,
 		MaxConcurrentRequests:  cfg.MaxRequests,
@@ -16,7 +15,7 @@ func wrapHystrxConfig(cfg conf.BreakerConfig) hystrix.CommandConfig {
 		RequestVolumeThreshold: cfg.ReqVolThreshold,
 	}
 }
-func HystrixBreaker(cfg conf.BreakerConfig) endpoint.Middleware {
+func HystrixBreaker(cfg Config) endpoint.Middleware {
 	hystrix.ConfigureCommand(cfg.Name, wrapHystrxConfig(cfg))
 	return circuitbreaker.Hystrix(cfg.Name)
 }

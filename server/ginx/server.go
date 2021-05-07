@@ -2,19 +2,14 @@ package ginx
 
 import (
 	"fmt"
-	"github.com/Tooooommy/go-one/server/conf"
+	"github.com/Tooooommy/go-one/server"
 	"github.com/gin-gonic/gin"
-)
-
-// Default value
-var (
-	Name = "go-one"
 )
 
 // Server
 type Server struct {
 	eng *gin.Engine
-	cfg conf.HttpConfig
+	cfg Config
 }
 
 // ServerOption
@@ -22,13 +17,13 @@ type ServerOption func(s *Server)
 
 // NewServer: 实例化Server
 func NewServer(options ...ServerOption) *Server {
+	cfg := Config{
+		Config: server.DefaultConfig(),
+	}
+	eng := gin.Default()
 	s := &Server{
-		eng: gin.New(),
-		cfg: conf.HttpConfig{
-			Name: Name,
-			Host: "127.0.0.1",
-			Port: 9091,
-		},
+		eng: eng,
+		cfg: cfg,
 	}
 	for _, opt := range options {
 		opt(s)
@@ -44,7 +39,7 @@ func WithGinEngine(eng *gin.Engine) ServerOption {
 }
 
 // WithConfig: 设置Config
-func WithConfig(cfg conf.HttpConfig) ServerOption {
+func WithConfig(cfg Config) ServerOption {
 	return func(s *Server) {
 		s.cfg = cfg
 	}
@@ -56,7 +51,7 @@ func (s *Server) Engine() *gin.Engine {
 }
 
 // Config: 获取config.HttpConfig配置
-func (s *Server) Config() conf.HttpConfig {
+func (s *Server) Config() Config {
 	return s.cfg
 }
 

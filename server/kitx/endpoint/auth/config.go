@@ -1,6 +1,6 @@
-package conf
+package auth
 
-type JwtConfig struct {
+type Config struct {
 	Secret      string `json:"secret"`
 	Timeout     int    `json:"timeout"` // hour
 	PreSecret   string `json:"pre_secret"`
