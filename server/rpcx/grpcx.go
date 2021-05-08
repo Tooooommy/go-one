@@ -10,7 +10,10 @@ type GrpcServer struct {
 	options            []grpc.ServerOption
 	streamInterceptors []grpc.StreamServerInterceptor
 	unaryInterceptors  []grpc.UnaryServerInterceptor
+	register           []RegisterFunc
 }
+
+type RegisterFunc func(*grpc.Server)
 
 func NewGrpcServer(address string) *GrpcServer {
 	return &GrpcServer{
@@ -30,6 +33,10 @@ func (s *GrpcServer) UseUnaryInterceptors(interceptor ...grpc.UnaryServerInterce
 	s.unaryInterceptors = append(s.unaryInterceptors, interceptor...)
 }
 
+func (s *GrpcServer) Register(register ...RegisterFunc) {
+	s.register = append(s.register, register...)
+}
+
 func (s *GrpcServer) Start() error {
 	lis, err := net.Listen("tcp", s.address)
 	if err != nil {
@@ -39,5 +46,8 @@ func (s *GrpcServer) Start() error {
 	s.options = append(s.options, grpc.ChainStreamInterceptor(s.streamInterceptors...))
 	server := grpc.NewServer(s.options...)
 	defer server.GracefulStop() // TODO: 可能优化
+	for _, register := range s.register {
+		register(server)
+	}
 	return server.Serve(lis)
 }
