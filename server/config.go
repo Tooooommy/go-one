@@ -14,6 +14,10 @@ type Config struct {
 	KeyFile  string `json:"key_file"`
 }
 
+func (c Config) HaveCert() bool {
+	return len(c.CertFile) > 0 && len(c.KeyFile) > 0
+}
+
 func DefaultConfig() Config {
 	return Config{
 		Name: DefaultName,

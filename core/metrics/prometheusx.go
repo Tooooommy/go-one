@@ -17,10 +17,6 @@ func NewPromxCounter(cfg Config, labelNames ...string) *kitprom.Counter {
 	}, labelNames)
 }
 
-func NopCouter() *kitprom.Counter {
-	return &kitprom.Counter{}
-}
-
 func NewPromxGauge(cfg Config, labelNames ...string) *kitprom.Gauge {
 	return kitprom.NewGaugeFrom(prometheus.GaugeOpts{
 		Namespace:   cfg.Namespace,

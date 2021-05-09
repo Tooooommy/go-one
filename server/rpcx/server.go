@@ -43,13 +43,18 @@ func WithRpc(rpc *GrpcServer) ServerOption {
 }
 
 func (s *Server) Start() error {
-	// TODO: file 路径
-	if s.cfg.CertFile != "" && s.cfg.KeyFile != "" {
+	if s.cfg.HaveCert() { // 验证
 		tls, err := credentials.NewServerTLSFromFile(s.cfg.CertFile, s.cfg.KeyFile)
 		if err != nil {
 			return err
 		}
 		s.rpc.WithOption(grpc.Creds(tls))
 	}
+
+	if s.cfg.HaveEtcd() {
+		s.rpc.EnableEtcd(s.cfg.Discov)
+	}
+	defer s.rpc.Stop()
+
 	return s.rpc.Start()
 }
