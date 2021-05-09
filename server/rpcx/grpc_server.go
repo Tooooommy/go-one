@@ -38,7 +38,9 @@ func (s *GrpcServer) UseUnaryInterceptors(interceptor ...grpc.UnaryServerInterce
 }
 
 func (s *GrpcServer) EnableEtcd(cfg discov.Config) {
-	s.etcd = discov.NewEtcd(cfg)
+	if cfg.HaveEtcd() {
+		s.etcd = discov.NewEtcd(cfg)
+	}
 }
 
 func (s *GrpcServer) UseEtcdService(service ...discov.Service) {

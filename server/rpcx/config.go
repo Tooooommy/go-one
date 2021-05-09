@@ -9,7 +9,3 @@ type Config struct {
 	server.Config
 	Discov discov.Config
 }
-
-func (c Config) HaveEtcd() bool {
-	return len(c.Discov.Hosts) > 0
-}

@@ -27,3 +27,7 @@ func (c Config) GetEtcdClientOptions() etcdv3.ClientOptions {
 		Password:      c.Password,
 	}
 }
+
+func (c Config) HaveEtcd() bool {
+	return len(c.Hosts) > 0
+}

@@ -3,7 +3,12 @@ package discov
 import (
 	"context"
 	"github.com/Tooooommy/go-one/core/logx"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/etcdv3"
+	"github.com/go-kit/kit/sd/lb"
+	"google.golang.org/grpc"
+	"io"
 	"time"
 )
 
@@ -71,4 +76,26 @@ func (m *Etcd) Register(s Service) error {
 // Deregister
 func (m *Etcd) Deregister(s Service) error {
 	return m.cli.Deregister(s.GetEtcdService())
+}
+
+func (m *Etcd) NewInstancer(prefix string) (*etcdv3.Instancer, error) {
+	return etcdv3.NewInstancer(m.cli, prefix, logx.KitL())
+}
+
+type EndpointFactory func(conn *grpc.ClientConn) endpoint.Endpoint
+
+func makeFactory(factory EndpointFactory) sd.Factory {
+	return func(instance string) (endpoint.Endpoint, io.Closer, error) {
+		conn, err := grpc.Dial(instance)
+		if err != nil {
+			return nil, nil, err
+		}
+		return factory(conn), conn, nil
+	}
+}
+
+func (m *Etcd) Endpoints(ins *etcdv3.Instancer, factory EndpointFactory, retryMax, retryTimeout int) endpoint.Endpoint {
+	endpointer := sd.NewEndpointer(ins, makeFactory(factory), logx.KitL())
+	balancer := lb.NewRandom(endpointer, time.Now().UnixNano())
+	return lb.Retry(retryMax, time.Duration(retryTimeout)*time.Millisecond, balancer)
 }
