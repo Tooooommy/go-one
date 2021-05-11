@@ -24,7 +24,7 @@ func NewServer(cfg Config, options ...ServerOption) *Server {
 	if cfg.Port <= 0 {
 		cfg.Port = 9080
 	}
-	reg := discov.NewRegister(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
+	reg := discov.NewRegister()
 	svr := &Server{
 		cfg: cfg,
 		reg: reg,
@@ -67,5 +67,6 @@ func (s *Server) Start() error {
 		s.reg.Finalizer(discov.DeregisterEtcd(cli))
 		s.reg.Before(discov.RegisterEtcd(cli))
 	}
-	return s.reg.Serve()
+	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
+	return s.reg.Serve(addr)
 }

@@ -7,7 +7,6 @@ import (
 
 type (
 	register struct {
-		address           string
 		server            *grpc.Server
 		option            []grpc.ServerOption
 		streamInterceptor []grpc.StreamServerInterceptor
@@ -26,7 +25,7 @@ type (
 		Register(...RegisterFactory) Register
 		Before(...BeforeFactory) Register
 		Finalizer(...FinalizerFactory) Register
-		Serve(...string) error
+		Serve(string) error
 	}
 
 	// Service
@@ -42,8 +41,8 @@ type (
 	RegisterFactory  func(*grpc.Server)
 )
 
-func NewRegister(addr string) Register {
-	return &register{address: addr}
+func NewRegister() Register {
+	return &register{}
 }
 
 func (r *register) Option(option ...grpc.ServerOption) Register {
@@ -80,7 +79,7 @@ func (r *register) Finalizer(finalizer ...FinalizerFactory) Register {
 	return r
 }
 
-func (r *register) Serve(address ...string) error {
+func (r *register) Serve(address string) error {
 	defer func() {
 		r.server.GracefulStop()
 
@@ -89,10 +88,7 @@ func (r *register) Serve(address ...string) error {
 		}
 	}()
 
-	if len(address) > 0 {
-		r.address = address[0]
-	}
-	lis, err := net.Listen("tcp", r.address)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		return err
 	}
