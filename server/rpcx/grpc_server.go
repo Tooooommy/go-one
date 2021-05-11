@@ -73,6 +73,7 @@ func (s *GrpcServer) Start() error {
 		register(s.server)
 	}
 	return s.server.Serve(lis)
+
 }
 
 func (s *GrpcServer) Stop() error {
