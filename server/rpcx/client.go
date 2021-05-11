@@ -1,42 +1,36 @@
 package rpcx
 
 import (
-	"context"
 	"github.com/Tooooommy/go-one/core/discov"
+	"sync"
 )
 
 type Client struct {
-	cfg Config
-	rpc *GrpcClient
+	etcd *discov.Etcd
+	invs sync.Map
 }
 
 type ClientOption func(*Client)
 
 // NewClient
-func NewClient(cfg Config, options ...ServerOption) (*Client, error) {
-	cli, err := NewGrpcClient(cfg.Discov)
+func NewClient(cfg Config) (*Client, error) {
+	cli, err := discov.NewEtcd(cfg.Discov)
 	if err != nil {
 		return nil, err
 	}
-	client := &Client{
-		cfg: cfg,
-		rpc: cli,
-	}
-	return client, nil
+	return &Client{etcd: cli}, nil
 }
 
-func WithClientCof(cfg Config) ClientOption {
-	return func(client *Client) {
-		client.cfg = cfg
+// 加上读写时
+func (c *Client) Invoker(prefix string) (*discov.Invoker, error) {
+	if val, ok := c.invs.Load(prefix); ok {
+		return val.(*discov.Invoker), nil
+	} else {
+		ins, err := c.etcd.NewInvoker(prefix)
+		if err != nil {
+			return nil, err
+		}
+		c.invs.Store(prefix, ins)
+		return ins, err
 	}
-}
-
-func WithClientRpc(rpc *GrpcClient) ClientOption {
-	return func(client *Client) {
-		client.rpc = rpc
-	}
-}
-
-func (c *Client) Invoke(ctx context.Context, in interface{}, prefix string, factory discov.EndpointFactory) (interface{}, error) {
-	return c.rpc.Invoke(prefix, factory)(ctx, in)
 }
