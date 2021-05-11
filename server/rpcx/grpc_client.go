@@ -3,43 +3,42 @@ package rpcx
 import (
 	"github.com/Tooooommy/go-one/core/discov"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/sd/etcdv3"
+	grpctranspot "github.com/go-kit/kit/transport/grpc"
+	"google.golang.org/grpc"
+	"io"
 	"sync"
 )
 
 // GrpcClient -> client
-type GrpcClient struct {
-	etcd *discov.Etcd
-	insm sync.Map
-}
+type (
+	GrpcClient struct {
+		etcd *discov.Etcd
+		insm sync.Map
+	}
+
+	EncodeRequest  grpctranspot.EncodeRequestFunc
+	DecodeResponse grpctranspot.DecodeResponseFunc
+)
 
 // NewGrpcClient
-func NewGrpcClient() *GrpcClient {
-	return &GrpcClient{}
-}
-
-// EnableEtcd
-func (c *GrpcClient) EnableEtcd(cfg discov.Config) {
-	c.etcd = discov.NewEtcd(cfg)
+func NewGrpcClient(cfg discov.Config) (*GrpcClient, error) {
+	cli, err := discov.NewEtcd(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &GrpcClient{etcd: cli}, nil
 }
 
 // 加上读写时
-func (c *GrpcClient) GetIns(prefix string) (*etcdv3.Instancer, error) {
+func (c *GrpcClient) GetInvoker(prefix string) (*discov.Invoker, error) {
 	if val, ok := c.insm.Load(prefix); ok {
-		return val.(*etcdv3.Instancer), nil
+		return val.(*discov.Invoker), nil
 	} else {
-		ins, err := c.etcd.NewInstancer(prefix)
+		ins, err := c.etcd.NewInvoker(prefix)
 		if err != nil {
 			return nil, err
 		}
 		c.insm.Store(prefix, ins)
 		return ins, err
 	}
-}
-
-func (c *GrpcClient) Endpoints(prefix string, factory discov.EndpointFactory) endpoint.Endpoint {
-	ins, err := c.GetIns(prefix)
-	if err != nil {
-	}
-	return c.etcd.Endpoints(ins, factory, 0, 0)
 }

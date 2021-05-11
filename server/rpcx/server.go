@@ -2,7 +2,6 @@ package rpcx
 
 import (
 	"fmt"
-	"github.com/Tooooommy/go-one/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -17,12 +16,14 @@ type Server struct {
 type ServerOption func(s *Server)
 
 // NewServer
-func NewServer(options ...ServerOption) *Server {
-	cfg := Config{
-		Config: server.DefaultConfig(),
+func NewServer(cfg Config, options ...ServerOption) *Server {
+	if cfg.Host == "" {
+		cfg.Host = "0.0.0.0"
 	}
-	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	rpc := NewGrpcServer(address)
+	if cfg.Port <= 0 {
+		cfg.Port = 9080
+	}
+	rpc := NewGrpcServer(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
 	svr := &Server{
 		cfg: cfg,
 		rpc: rpc,
@@ -49,17 +50,20 @@ func WithServerRpc(rpc *GrpcServer) ServerOption {
 
 // Start
 func (s *Server) Start() error {
-	err := s.enableCert()
+	err := s.EnableCert()
 	if err != nil {
 		return err
 	}
-	s.rpc.EnableEtcd(s.cfg.Discov)
+	err = s.rpc.EnableEtcd(s.cfg.Discov)
+	if err != nil {
+		return err
+	}
 	defer s.rpc.Stop()
 	return s.rpc.Start()
 }
 
-// enableCert
-func (s *Server) enableCert() error {
+// EnableCert
+func (s *Server) EnableCert() error {
 	if s.cfg.HaveCert() { // 验证
 		tls, err := credentials.NewServerTLSFromFile(s.cfg.CertFile, s.cfg.KeyFile)
 		if err != nil {
