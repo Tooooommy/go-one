@@ -2,10 +2,6 @@ package rpcx
 
 import (
 	"github.com/Tooooommy/go-one/core/discov"
-	"github.com/go-kit/kit/endpoint"
-	grpctranspot "github.com/go-kit/kit/transport/grpc"
-	"google.golang.org/grpc"
-	"io"
 	"sync"
 )
 
@@ -15,9 +11,6 @@ type (
 		etcd *discov.Etcd
 		insm sync.Map
 	}
-
-	EncodeRequest  grpctranspot.EncodeRequestFunc
-	DecodeResponse grpctranspot.DecodeResponseFunc
 )
 
 // NewGrpcClient
