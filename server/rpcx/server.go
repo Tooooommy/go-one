@@ -11,7 +11,7 @@ import (
 // Server
 type Server struct {
 	cfg Config
-	reg *discov.Register
+	reg *discov.Registry
 }
 
 // ServerOption
@@ -44,7 +44,7 @@ func WithConfig(cfg Config) ServerOption {
 }
 
 // WithServerRpc
-func WithRegister(reg *discov.Register) ServerOption {
+func WithRegister(reg *discov.Registry) ServerOption {
 	return func(s *Server) {
 		s.reg = reg
 	}

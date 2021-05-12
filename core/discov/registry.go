@@ -6,8 +6,8 @@ import (
 )
 
 type (
-	// Register
-	Register struct {
+	// Registry
+	Registry struct {
 		server            *grpc.Server
 		option            []grpc.ServerOption
 		streamInterceptor []grpc.StreamServerInterceptor
@@ -35,47 +35,47 @@ type (
 )
 
 // NewRegister
-func NewRegister() *Register {
-	return &Register{}
+func NewRegister() *Registry {
+	return &Registry{}
 }
 
 // Option
-func (r *Register) Option(option ...grpc.ServerOption) *Register {
+func (r *Registry) Option(option ...grpc.ServerOption) *Registry {
 	r.option = append(r.option, option...)
 	return r
 }
 
 // StreamInterceptor
-func (r *Register) StreamInterceptor(interceptors ...grpc.StreamServerInterceptor) *Register {
+func (r *Registry) StreamInterceptor(interceptors ...grpc.StreamServerInterceptor) *Registry {
 	r.streamInterceptor = append(r.streamInterceptor, interceptors...)
 	return r
 }
 
 // UnaryInterceptor
-func (r *Register) UnaryInterceptor(interceptor ...grpc.UnaryServerInterceptor) *Register {
+func (r *Registry) UnaryInterceptor(interceptor ...grpc.UnaryServerInterceptor) *Registry {
 	r.unaryInterceptor = append(r.unaryInterceptor, interceptor...)
 	return r
 }
 
 // Service
-func (r *Register) Service(service ...Service) *Register {
+func (r *Registry) Service(service ...Service) *Registry {
 	r.service = append(r.service, service...)
 	return r
 }
 
-// Register
-func (r *Register) Register(Register ...RegisterFactory) *Register {
+// Registry
+func (r *Registry) Register(Register ...RegisterFactory) *Registry {
 	r.register = append(r.register, Register...)
 	return r
 }
 
-func (r *Register) Discovery(discovery Discovery) *Register {
+func (r *Registry) Discovery(discovery Discovery) *Registry {
 	r.discovery = discovery
 	return r
 }
 
 // Serve
-func (r *Register) Serve(address string) error {
+func (r *Registry) Serve(address string) error {
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		return err
