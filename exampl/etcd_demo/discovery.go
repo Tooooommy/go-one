@@ -18,7 +18,7 @@ func NewDiscovery(info *NodeInfo, conf clientv3.Config, mgr *NodesManager) (dis 
 	d := &Discovery{}
 	d.info = info
 	if mgr == nil {
-		return nil, fmt.Errorf("[Discovery] mgr == nil")
+		return nil, fmt.Errorf("[Etcd] mgr == nil")
 	}
 	d.nodes = mgr
 	d.cli, err = clientv3.New(conf)
@@ -29,18 +29,18 @@ func (d *Discovery) pull() {
 	kv := clientv3.NewKV(d.cli)
 	resp, err := kv.Get(context.TODO(), "discovery/", clientv3.WithPrefix())
 	if err != nil {
-		log.Fatalf("[Discovery] kv.Get err:%+v", err)
+		log.Fatalf("[Etcd] kv.Get err:%+v", err)
 		return
 	}
 	for _, v := range resp.Kvs {
 		node := &NodeInfo{}
 		err = json.Unmarshal(v.Value, node)
 		if err != nil {
-			log.Fatalf("[Discovery] json.Unmarshal err:%+v", err)
+			log.Fatalf("[Etcd] json.Unmarshal err:%+v", err)
 			continue
 		}
 		d.nodes.AddNode(node)
-		log.Printf("[Discovery] pull node:%+v", node)
+		log.Printf("[Etcd] pull node:%+v", node)
 	}
 }
 
@@ -62,14 +62,14 @@ func (d *Discovery) watchEvent(evs []*clientv3.Event) {
 			node := &NodeInfo{}
 			err := json.Unmarshal(ev.Kv.Value, node)
 			if err != nil {
-				log.Fatalf("[Discovery] json.Unmarshal err:%+v", err)
+				log.Fatalf("[Etcd] json.Unmarshal err:%+v", err)
 				continue
 			}
 			d.nodes.AddNode(node)
-			log.Printf(fmt.Sprintf("[Discovery] new node:%s", string(ev.Kv.Value)))
+			log.Printf(fmt.Sprintf("[Etcd] new node:%s", string(ev.Kv.Value)))
 		case clientv3.EventTypeDelete:
 			d.nodes.DelNode(string(ev.Kv.Key))
-			log.Printf(fmt.Sprintf("[Discovery] del node:%s data:%s", string(ev.Kv.Key), string(ev.Kv.Value)))
+			log.Printf(fmt.Sprintf("[Etcd] del node:%s data:%s", string(ev.Kv.Key), string(ev.Kv.Value)))
 		}
 	}
 }

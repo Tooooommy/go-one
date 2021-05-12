@@ -60,8 +60,8 @@ func (s *Server) Start() error {
 		s.reg.Option(grpc.Creds(tls))
 	}
 
-	if s.cfg.Discov.HaveEtcd() {
-		cli, err := etcdx.NewEtcd(s.cfg.Discov)
+	if s.cfg.Etcd.HaveEtcd() {
+		cli, err := etcdx.NewEtcd(s.cfg.Etcd)
 		if err != nil {
 			return err
 		}

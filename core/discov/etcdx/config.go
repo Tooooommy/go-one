@@ -1,4 +1,4 @@
-package discov
+package etcdx
 
 import (
 	"github.com/go-kit/kit/sd/etcdv3"

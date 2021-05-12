@@ -58,9 +58,9 @@ func (s *Server) Config() Config {
 // Start: 启动服务
 func (s *Server) Start() error {
 	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
-	if len(s.cfg.CertFile) == 0 && len(s.cfg.KeyFile) == 0 {
-		return s.eng.Run(addr)
-	} else {
+	if s.cfg.HaveCert() {
 		return s.eng.RunTLS(addr, s.cfg.CertFile, s.cfg.KeyFile)
+	} else {
+		return s.eng.Run(addr)
 	}
 }
