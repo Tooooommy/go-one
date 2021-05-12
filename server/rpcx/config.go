@@ -7,5 +7,5 @@ import (
 
 type Config struct {
 	server.Config
-	Discov discov.Config
+	Discovery discov.Config `json:"discovery"`
 }

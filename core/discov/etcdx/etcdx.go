@@ -10,36 +10,23 @@ import (
 )
 
 type (
-	Client etcdv3.Client
-	// Etcd
-	Etcd struct {
+	ClientV3 etcdv3.Client
+	// Client
+	Client struct {
 		cfg discov.Config
-		cli Client
+		cli ClientV3
 	}
 )
 
 // NewEtcd
-func NewEtcd(cfg discov.Config) (*Etcd, error) {
-	e := &Etcd{cfg: cfg}
-	_, err := e.newClient()
-	return e, err
-}
-
-// newClient
-func (m *Etcd) newClient() (etcdv3.Client, error) {
-	if m.cli == nil {
-		options := m.cfg.GetEtcdClientOptions()
-		cli, err := etcdv3.NewClient(context.Background(), m.cfg.Hosts, options)
-		if err != nil {
-			return nil, err
-		}
-		m.cli = cli
-	}
-	return m.cli, nil
+func NewEtcd(cfg discov.Config) (*Client, error) {
+	options := cfg.GetEtcdClientOptions()
+	cli, err := etcdv3.NewClient(context.Background(), cfg.Hosts, options)
+	return &Client{cfg: cfg, cli: cli}, err
 }
 
 // register
-func (m *Etcd) Register(s discov.Service) error {
+func (m *Client) Register(s discov.Service) error {
 	return m.cli.Register(etcdv3.Service{
 		Key:   s.Key,
 		Value: s.Val,
@@ -51,7 +38,7 @@ func (m *Etcd) Register(s discov.Service) error {
 }
 
 // Deregister
-func (m *Etcd) Deregister(s discov.Service) error {
+func (m *Client) Deregister(s discov.Service) error {
 	return m.cli.Deregister(etcdv3.Service{
 		Key:   s.Key,
 		Value: s.Val,
@@ -62,6 +49,6 @@ func (m *Etcd) Deregister(s discov.Service) error {
 	})
 }
 
-func (m *Etcd) NewInstancer(key string) (sd.Instancer, error) {
+func (m *Client) NewInstancer(key string) (sd.Instancer, error) {
 	return etcdv3.NewInstancer(m.cli, key, logx.KitL())
 }
