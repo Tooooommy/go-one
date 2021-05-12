@@ -38,6 +38,23 @@ type (
 	}
 )
 
+// NewInvoker
+func NewInvoker() *Invoker {
+	return &Invoker{}
+}
+
+// Prefix
+func (i *Invoker) Prefix(prefix string) *Invoker {
+	i.prefix = prefix
+	return i
+}
+
+// Instancer
+func (i *Invoker) Instancer(instancer sd.Instancer) *Invoker {
+	i.instancer = instancer
+	return i
+}
+
 // Retry
 func (i *Invoker) Retry(max int, timeout int) *Invoker {
 	i.max = max
@@ -110,7 +127,11 @@ func (i *Invoker) Service(service string) {
 }
 
 // Endpoint
-func (i *Invoker) Endpoint() endpoint.Endpoint {
+func (i *Invoker) Endpoint(addr ...string) endpoint.Endpoint {
+	if i.instancer == nil {
+		i.instancer = sd.FixedInstancer(addr)
+	}
+
 	endpointer := sd.NewEndpointer(i.instancer, i.factory, logx.KitL())
 	balancer := lb.NewRoundRobin(endpointer)
 	if i.max > 0 && i.timeout > 0 {
@@ -123,9 +144,9 @@ func (i *Invoker) Endpoint() endpoint.Endpoint {
 }
 
 // Invoke
-func (i *Invoker) Invoke(context context.Context) (interface{}, error) {
+func (i *Invoker) Invoke(context context.Context, addr ...string) (interface{}, error) {
 	if i.endpoint == nil {
-		i.Endpoint()
+		i.Endpoint(addr...)
 	}
 
 	if i.endpoint == nil {

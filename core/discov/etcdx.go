@@ -8,11 +8,11 @@ import (
 )
 
 type (
-
+	Client etcdv3.Client
 	// Etcd
 	Etcd struct {
 		cfg Config
-		cli etcdv3.Client
+		cli Client
 	}
 )
 
