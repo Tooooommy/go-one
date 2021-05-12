@@ -3,7 +3,7 @@ package etcdx
 import (
 	"context"
 	"github.com/Tooooommy/go-one/core/discov"
-	"github.com/Tooooommy/go-one/core/logx"
+	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/etcdv3"
 	"time"
@@ -50,5 +50,5 @@ func (m *Client) Deregister(s discov.Service) error {
 }
 
 func (m *Client) NewInstancer(key string) (sd.Instancer, error) {
-	return etcdv3.NewInstancer(m.cli, key, logx.KitL())
+	return etcdv3.NewInstancer(m.cli, key, zapx.KitL())
 }

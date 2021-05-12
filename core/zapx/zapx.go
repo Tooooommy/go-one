@@ -1,4 +1,4 @@
-package logx
+package zapx
 
 import (
 	"github.com/go-kit/kit/log"

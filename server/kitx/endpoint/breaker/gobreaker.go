@@ -1,7 +1,7 @@
 package breaker
 
 import (
-	"github.com/Tooooommy/go-one/core/logx"
+	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/sony/gobreaker"
@@ -17,7 +17,7 @@ func wrapGoBreakerSettings(cfg Config) gobreaker.Settings {
 		ReadyToTrip: readyToTrip(cfg.ErrPerThreshold),
 		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
 			// TODO: 告警
-			logx.Info().String("name", name).
+			zapx.Info().String("name", name).
 				Int("from_state", int(from)).
 				Int("to_state", int(to)).
 				Msg("状态发生变化")

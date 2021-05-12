@@ -1,4 +1,4 @@
-package logx
+package zapx
 
 type mode string
 

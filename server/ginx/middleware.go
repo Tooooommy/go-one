@@ -1,8 +1,8 @@
 package ginx
 
 import (
-	"github.com/Tooooommy/go-one/core/logx"
 	"github.com/Tooooommy/go-one/core/metrics"
+	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/requestid"
@@ -104,7 +104,7 @@ func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			err := recover()
-			logx.Error().Any("Recovery Error: %+v", err).Msg("GIN HTTP Panic")
+			zapx.Error().Any("Recovery Error: %+v", err).Msg("GIN HTTP Panic")
 			c.AbortWithStatus(http.StatusInternalServerError)
 		}()
 		c.Next()
@@ -115,7 +115,7 @@ func Recovery() gin.HandlerFunc {
 func StartTracing(name string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if len(name) > 0 {
-			rf := kitopentracing.ContextToHTTP(opentracing.GlobalTracer(), logx.KitL())
+			rf := kitopentracing.ContextToHTTP(opentracing.GlobalTracer(), zapx.KitL())
 			ctx := c.Request.Context()
 			span := opentracing.SpanFromContext(ctx)
 			if span == nil {

@@ -3,7 +3,7 @@ package discov
 import (
 	"context"
 	"errors"
-	"github.com/Tooooommy/go-one/core/logx"
+	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/lb"
@@ -132,7 +132,7 @@ func (i *Invoker) Endpoint() endpoint.Endpoint {
 		i.instancer = sd.FixedInstancer(i.address)
 	}
 
-	endpointer := sd.NewEndpointer(i.instancer, i.factory, logx.KitL())
+	endpointer := sd.NewEndpointer(i.instancer, i.factory, zapx.KitL())
 	balancer := lb.NewRoundRobin(endpointer)
 	if i.max > 0 && i.timeout > 0 {
 		i.endpoint = lb.Retry(i.max, time.Duration(i.timeout)*time.Millisecond, balancer)

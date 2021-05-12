@@ -2,7 +2,7 @@ package etcdx
 
 import (
 	"context"
-	"github.com/Tooooommy/go-one/core/logx"
+	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/etcdv3"
@@ -26,7 +26,7 @@ func TestServer(t *testing.T) {
 		Key:   "go-one",
 		Value: host,
 		TTL:   nil,
-	}, logx.KitL())
+	}, zapx.KitL())
 	register.Register()
 	defer register.Deregister()
 	time.Sleep(1000 * time.Second)
@@ -49,14 +49,14 @@ func TestClient(t *testing.T) {
 
 	// 创建一个ir
 	// 可以共用
-	instancer, err := etcdv3.NewInstancer(client, "go-one", logx.KitL())
+	instancer, err := etcdv3.NewInstancer(client, "go-one", zapx.KitL())
 	if err != nil {
 		panic(err)
 	}
 	instancer.Stop()
 
 	// 无法共用
-	sd.NewEndpointer(instancer, factory, logx.KitL())
+	sd.NewEndpointer(instancer, factory, zapx.KitL())
 }
 
 //func MakeEndpoint(conn *grpc.ClientConn) endpoint.Endpoint {
