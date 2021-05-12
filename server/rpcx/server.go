@@ -3,6 +3,7 @@ package rpcx
 import (
 	"fmt"
 	"github.com/Tooooommy/go-one/core/discov"
+	"github.com/Tooooommy/go-one/core/discov/etcdx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -10,7 +11,7 @@ import (
 // Server
 type Server struct {
 	cfg Config
-	reg discov.Register
+	reg *discov.Register
 }
 
 // ServerOption
@@ -43,7 +44,7 @@ func WithConfig(cfg Config) ServerOption {
 }
 
 // WithServerRpc
-func WithRegister(reg discov.Register) ServerOption {
+func WithRegister(reg *discov.Register) ServerOption {
 	return func(s *Server) {
 		s.reg = reg
 	}
@@ -60,12 +61,11 @@ func (s *Server) Start() error {
 	}
 
 	if s.cfg.Discov.HaveEtcd() {
-		cli, err := discov.NewEtcd(s.cfg.Discov)
+		cli, err := etcdx.NewEtcd(s.cfg.Discov)
 		if err != nil {
 			return err
 		}
-		s.reg.Finalizer(discov.DeregisterEtcd(cli))
-		s.reg.Before(discov.RegisterEtcd(cli))
+		s.reg.Discovery(cli)
 	}
 	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	return s.reg.Serve(addr)

@@ -31,7 +31,7 @@ type (
 		decode    DecodeResponse
 		max       int
 		timeout   int
-		prefix    string
+		address   []string
 		method    string
 		service   string
 		request   interface{}
@@ -41,12 +41,6 @@ type (
 // NewInvoker
 func NewInvoker() *Invoker {
 	return &Invoker{}
-}
-
-// Prefix
-func (i *Invoker) Prefix(prefix string) *Invoker {
-	i.prefix = prefix
-	return i
 }
 
 // Instancer
@@ -99,6 +93,12 @@ func (i *Invoker) Connection(conn ConnectFactory) *Invoker {
 	return i
 }
 
+// Address
+func (i *Invoker) Address(addr ...string) *Invoker {
+	i.address = addr
+	return i
+}
+
 // Request
 func (i *Invoker) Request(request interface{}) {
 	i.request = request
@@ -127,9 +127,9 @@ func (i *Invoker) Service(service string) {
 }
 
 // Endpoint
-func (i *Invoker) Endpoint(addr ...string) endpoint.Endpoint {
+func (i *Invoker) Endpoint() endpoint.Endpoint {
 	if i.instancer == nil {
-		i.instancer = sd.FixedInstancer(addr)
+		i.instancer = sd.FixedInstancer(i.address)
 	}
 
 	endpointer := sd.NewEndpointer(i.instancer, i.factory, logx.KitL())
@@ -144,9 +144,9 @@ func (i *Invoker) Endpoint(addr ...string) endpoint.Endpoint {
 }
 
 // Invoke
-func (i *Invoker) Invoke(context context.Context, addr ...string) (interface{}, error) {
+func (i *Invoker) Invoke(context context.Context) (interface{}, error) {
 	if i.endpoint == nil {
-		i.Endpoint(addr...)
+		i.Endpoint()
 	}
 
 	if i.endpoint == nil {

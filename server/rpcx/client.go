@@ -2,35 +2,33 @@ package rpcx
 
 import (
 	"github.com/Tooooommy/go-one/core/discov"
-	"sync"
+	"github.com/Tooooommy/go-one/core/discov/etcdx"
 )
 
 type Client struct {
-	etcd *discov.Etcd
-	invs sync.Map
+	cfg Config
 }
-
-type ClientOption func(*Client)
 
 // NewClient
-func NewClient(cfg Config) (*Client, error) {
-	cli, err := discov.NewEtcd(cfg.Discov)
-	if err != nil {
-		return nil, err
-	}
-	return &Client{etcd: cli}, nil
+func NewClient(cfg Config) *Client {
+	return &Client{cfg: cfg}
 }
 
-// 加上读写时
-func (c *Client) Invoker(prefix string) (*discov.Invoker, error) {
-	if val, ok := c.invs.Load(prefix); ok {
-		return val.(*discov.Invoker), nil
-	} else {
-		ins, err := c.etcd.NewInvoker(prefix)
+// Invoker
+func (c *Client) Invoker(key string) (*discov.Invoker, error) {
+	inv := discov.NewInvoker()
+	if c.cfg.Discov.HaveEtcd() {
+		etcd, err := etcdx.NewEtcd(c.cfg.Discov)
 		if err != nil {
 			return nil, err
 		}
-		c.invs.Store(prefix, ins)
-		return ins, err
+		instancer, err := etcd.NewInstancer(key)
+		if err != nil {
+			return nil, err
+		}
+		inv.Instancer(instancer)
+	} else {
+		inv.Address(c.cfg.Discov.Hosts...)
 	}
+	return inv, nil
 }

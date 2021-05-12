@@ -1,4 +1,4 @@
-package discov
+package etcdx
 
 import (
 	"context"
