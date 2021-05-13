@@ -129,7 +129,7 @@ func StartTracing(name string) gin.HandlerFunc {
 	}
 }
 
-// StartPromxMetrics: 开启开启普罗米修斯
+// StartPromxMetrics: 开启普罗米修斯
 func StartPromxMetrics(cfg metrics.Config) gin.HandlerFunc {
 	if len(cfg.Name) != 0 || len(cfg.Namespace) != 0 || len(cfg.Subsystem) != 0 {
 		counter := metrics.NewPromxCounter(cfg)
