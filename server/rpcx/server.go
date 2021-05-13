@@ -19,12 +19,6 @@ type ServerOption func(s *Server)
 
 // NewServer
 func NewServer(cfg Config, options ...ServerOption) *Server {
-	if cfg.Host == "" {
-		cfg.Host = "0.0.0.0"
-	}
-	if cfg.Port <= 0 {
-		cfg.Port = 9080
-	}
 	reg := discov.NewRegister()
 	svr := &Server{
 		cfg: cfg,
@@ -43,7 +37,7 @@ func WithConfig(cfg Config) ServerOption {
 	}
 }
 
-// WithServerRpc
+// WithRegister
 func WithRegister(reg *discov.Registry) ServerOption {
 	return func(s *Server) {
 		s.reg = reg

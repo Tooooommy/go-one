@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+// JSONResponse
+type JSONResponse struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
+}
+
 // NoDecoder
 func NoDecoder(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc {
 	return func(ctx context.Context, req *http.Request) (interface{}, error) {
@@ -23,21 +30,21 @@ func NoEncoder(c *gin.Context) httptransport.EncodeResponseFunc {
 }
 
 // JSONDecoder
-func JSONDecoder(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc {
+func JSONDecoder(c *gin.Context, resp interface{}) httptransport.DecodeRequestFunc {
 	return func(ctx context.Context, req *http.Request) (interface{}, error) {
-		if err := c.BindHeader(request); err != nil {
+		if err := c.BindHeader(resp); err != nil {
 			return nil, err
 		}
-		if err := c.BindUri(request); err != nil {
+		if err := c.BindUri(resp); err != nil {
 			return nil, err
 		}
-		if err := c.BindQuery(request); err != nil {
+		if err := c.BindQuery(resp); err != nil {
 			return nil, err
 		}
-		if err := c.ShouldBind(request); err != nil {
+		if err := c.ShouldBind(resp); err != nil {
 			return nil, err
 		}
-		return request, nil
+		return resp, nil
 	}
 }
 
@@ -57,7 +64,7 @@ func JSONEncoder(c *gin.Context) httptransport.EncodeResponseFunc {
 }
 
 // FileDecoder
-func FileDecoder(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc {
+func FileDecoder(c *gin.Context, resp interface{}) httptransport.DecodeRequestFunc {
 	return func(ctx context.Context, req *http.Request) (interface{}, error) {
 		fs, err := c.MultipartForm()
 		if err != nil {

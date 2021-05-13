@@ -18,8 +18,8 @@ var (
 )
 
 type (
-	EncodeRequest  grpctranspot.EncodeRequestFunc
-	DecodeResponse grpctranspot.DecodeResponseFunc
+	EncodeFunc     grpctranspot.EncodeRequestFunc
+	DecodeFunc     grpctranspot.DecodeResponseFunc
 	ConnectFactory func(string) (*grpc.ClientConn, error)
 
 	Invoker struct {
@@ -27,8 +27,8 @@ type (
 		factory   sd.Factory
 		conn      ConnectFactory
 		endpoint  endpoint.Endpoint
-		encode    EncodeRequest
-		decode    DecodeResponse
+		encode    EncodeFunc
+		decode    DecodeFunc
 		max       int
 		timeout   int
 		address   []string
@@ -105,13 +105,13 @@ func (i *Invoker) Request(request interface{}) {
 }
 
 // Encode
-func (i *Invoker) Encode(enc EncodeRequest) *Invoker {
+func (i *Invoker) Encode(enc EncodeFunc) *Invoker {
 	i.encode = enc
 	return i
 }
 
 // Decode
-func (i *Invoker) Decode(dec DecodeResponse) *Invoker {
+func (i *Invoker) Decode(dec DecodeFunc) *Invoker {
 	i.decode = dec
 	return i
 }

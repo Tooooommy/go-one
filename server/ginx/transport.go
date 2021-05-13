@@ -9,43 +9,58 @@ import (
 
 var ErrReturnIsNil = errors.New("return response is nil")
 
-type DecodeFunc func(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc
-type EncodeFunc func(c *gin.Context) httptransport.EncodeResponseFunc
+type (
+	DecodeFunc func(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc
+	EncodeFunc func(c *gin.Context) httptransport.EncodeResponseFunc
 
-// Transport
-type Transport struct {
-	options     []httptransport.ServerOption
-	middlewares []endpoint.Middleware
-}
+	// Transport
+	Transport struct {
+		options     []httptransport.ServerOption
+		middlewares []endpoint.Middleware
+		encode      EncodeFunc
+		decode      DecodeFunc
+	}
+)
 
 // NewTransport
 func NewTransport() *Transport {
-	return &Transport{
-		options: []httptransport.ServerOption{},
-	}
+	return &Transport{}
 }
 
-// WithOptions
+// With
 func (s *Transport) With(options ...httptransport.ServerOption) *Transport {
-	s.options = options
+	s.options = append(s.options, options...)
 	return s
 }
 
+// Use
 func (s *Transport) Use(middlewares ...endpoint.Middleware) *Transport {
-	s.middlewares = middlewares
+	s.middlewares = append(s.middlewares, middlewares...)
 	return s
 }
 
-// Handler
-func (s *Transport) Handler(e endpoint.Endpoint, request interface{}, dec DecodeFunc, enc EncodeFunc) gin.HandlerFunc {
+// Encode
+func (s *Transport) Encode(enc EncodeFunc) *Transport {
+	s.encode = enc
+	return s
+}
+
+// Decode
+func (s *Transport) Decode(dec DecodeFunc) *Transport {
+	s.decode = dec
+	return s
+}
+
+// Handle
+func (s *Transport) Handle(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
 	for _, middleware := range s.middlewares {
 		e = middleware(e)
 	}
 	return func(c *gin.Context) {
 		httptransport.NewServer(
 			e,
-			dec(c, request),
-			enc(c),
+			s.decode(c, resp),
+			s.encode(c),
 			s.options...,
 		).ServeHTTP(c.Writer, c.Request)
 	}
@@ -53,15 +68,15 @@ func (s *Transport) Handler(e endpoint.Endpoint, request interface{}, dec Decode
 
 // NoHandler
 func (s *Transport) NoHandler(e endpoint.Endpoint) gin.HandlerFunc {
-	return s.Handler(e, nil, NoDecoder, NoEncoder)
+	return s.Decode(NoDecoder).Encode(NoEncoder).Handle(e, nil)
 }
 
 // JSONHandler
-func (s *Transport) JSONHandler(e JSONEndpoint, response interface{}) gin.HandlerFunc {
-	return s.Handler(JsonToEndpoint(e), response, JSONDecoder, JSONEncoder)
+func (s *Transport) JSONHandler(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
+	return s.Decode(JSONDecoder).Encode(JSONEncoder).Handle(e, resp)
 }
 
 // FileHandler
-func (s *Transport) FileHandler(e FileEndpoint, response interface{}) gin.HandlerFunc {
-	return s.Handler(FileToEndpoint(e), response, FileDecoder, JSONEncoder)
+func (s *Transport) FileHandler(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
+	return s.Decode(FileDecoder).Encode(JSONEncoder).Handle(e, resp)
 }
