@@ -1,7 +1,7 @@
 package main
 
 import (
-	user "github.com/Tooooommy/go-one/exampl/hello_rpc"
+	user "github.com/Tooooommy/go-one/example/hello_rpc"
 	"google.golang.org/grpc"
 	"net"
 )

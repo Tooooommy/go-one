@@ -1,14 +1,18 @@
-package trace
+package jaegerx
 
 import (
 	"context"
+	"fmt"
+	"github.com/Tooooommy/go-one/core/trace"
 	"github.com/opentracing/opentracing-go"
+	"net/http"
 	"testing"
 	"time"
 )
 
 func TestNewJaegerTracer(t *testing.T) {
-	closer, err := InitJaegerTracer(Config{
+	carrier := opentracing.HTTPHeadersCarrier(http.Header{})
+	closer, err := InitJaegerTracer(trace.Config{
 		Name:             "go-one",
 		SamplerType:      "const",
 		SamplerParam:     1,
@@ -19,8 +23,18 @@ func TestNewJaegerTracer(t *testing.T) {
 		panic(err)
 	}
 	defer closer.Close()
-	span1 := opentracing.GlobalTracer().StartSpan("span1")
+	tracer := opentracing.GlobalTracer()
+	span1 := tracer.StartSpan("span1")
 	defer span1.Finish()
+	err = tracer.Inject(span1.Context(), opentracing.HTTPHeaders, carrier)
+	if err != nil {
+		panic(err)
+	}
+	spanCtx, err := tracer.Extract(opentracing.HTTPHeaders, carrier)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(spanCtx)
 	span1.SetBaggageItem("span1", "span1")
 	time.Sleep(10 * time.Millisecond)
 
