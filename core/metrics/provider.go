@@ -5,7 +5,10 @@ import (
 	kitprovider "github.com/go-kit/kit/metrics/provider"
 )
 
+// https://github.com/zserge/metric
+// https://github.com/propan/expvardash
 type (
+	// Metrics
 	Metrics struct {
 		provider  kitprovider.Provider
 		counter   kitmetrics.Counter
