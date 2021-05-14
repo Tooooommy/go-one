@@ -1,4 +1,4 @@
-package metrics
+package prometheusx
 
 import (
 	kitprom "github.com/go-kit/kit/metrics/prometheus"

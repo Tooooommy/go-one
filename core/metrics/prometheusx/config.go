@@ -1,4 +1,4 @@
-package metrics
+package prometheusx
 
 type Config struct {
 	Namespace   string              `json:"namespace"`
