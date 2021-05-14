@@ -10,6 +10,7 @@ import (
 	kitopentracing "github.com/go-kit/kit/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 	"net/http"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
@@ -101,15 +102,14 @@ func RealIPHandler() gin.HandlerFunc {
 }
 
 // RecoveryHandler: panic恢复
-func RecoveryHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			err := recover()
-			zapx.Error().Any("Recovery Error: %+v", err).Msg("GIN HTTP Panic")
+func RecoveryHandler(c *gin.Context) {
+	defer func() {
+		if result := recover(); result != nil {
+			zapx.Error().Any("Recovery Result: %+v", result).Msg(string(debug.Stack()))
 			c.AbortWithStatus(http.StatusInternalServerError)
-		}()
-		c.Next()
-	}
+		}
+	}()
+	c.Next()
 }
 
 // TraceHandler: 开启链路追踪
@@ -133,7 +133,7 @@ func MetricsHandler(m *metrics.Metrics) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		n := time.Now()
 		defer func() {
-			labels := []string{c.Request.Method, c.Request.Method, strconv.Itoa(c.Writer.Status())}
+			labels := []string{c.Request.Method, c.Request.URL.Path, strconv.Itoa(c.Writer.Status())}
 			m.With(labels...).Add(1).Observe(float64(time.Since(n).Milliseconds()))
 		}()
 		c.Next()
