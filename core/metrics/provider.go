@@ -42,7 +42,6 @@ func (m *Metrics) With(labelValues ...string) *Metrics {
 // Add
 func (m *Metrics) Add(delta float64) *Metrics {
 	m.counter.Add(delta)
-	m.gauge.Add(delta)
 	return m
 }
 
@@ -50,6 +49,14 @@ func (m *Metrics) Add(delta float64) *Metrics {
 func (m *Metrics) Set(value float64) *Metrics {
 	m.gauge.Set(value)
 	return m
+}
+
+func (m *Metrics) Incr(value float64) {
+	m.gauge.Add(value)
+}
+
+func (m *Metrics) Decr(value float64) {
+	m.gauge.Add(-value)
 }
 
 // Observe

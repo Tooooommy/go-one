@@ -1,7 +1,7 @@
 package ginx
 
 import (
-	"github.com/Tooooommy/go-one/core/metrics/prometheusx"
+	"github.com/Tooooommy/go-one/core/metrics"
 	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
@@ -129,21 +129,13 @@ func TraceHandler(name string) gin.HandlerFunc {
 }
 
 // MetricsHandler: 开启普罗米修斯
-func MetricsHandler(cfg prometheusx.Config) gin.HandlerFunc {
-	if len(cfg.Name) != 0 || len(cfg.Namespace) != 0 || len(cfg.Subsystem) != 0 {
-		counter := prometheusx.NewPromxCounter(cfg)
-		gauge := prometheusx.NewPromxGauge(cfg)
-		histogram := prometheusx.NewPromxHistogram(cfg)
-		return func(c *gin.Context) {
-			n := time.Now()
-			defer func() {
-				labels := []string{c.Request.Method, c.Request.Method, strconv.Itoa(c.Writer.Status())}
-				counter.With(labels...).Add(1)
-				gauge.Add(1)
-				histogram.With(labels...).Observe(float64(time.Since(n).Milliseconds()))
-			}()
-			c.Next()
-		}
+func MetricsHandler(m *metrics.Metrics) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		n := time.Now()
+		defer func() {
+			labels := []string{c.Request.Method, c.Request.Method, strconv.Itoa(c.Writer.Status())}
+			m.With(labels...).Add(1).Observe(float64(time.Since(n).Milliseconds()))
+		}()
+		c.Next()
 	}
-	return Nop()
 }
