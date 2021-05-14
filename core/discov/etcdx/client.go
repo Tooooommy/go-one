@@ -10,24 +10,27 @@ import (
 )
 
 type (
-	ClientV3 etcdv3.Client
+	client etcdv3.Client
 	// Client
 	Client struct {
 		cfg Config
-		cli ClientV3
+		cli client
 	}
 )
 
-// NewEtcd
-func NewEtcd(cfg Config) (*Client, error) {
-	options := cfg.GetEtcdClientOptions()
+// NewClient
+func NewClient(cfg Config) (*Client, error) {
+	options := cfg.ClientOptions()
 	cli, err := etcdv3.NewClient(context.Background(), cfg.Hosts, options)
-	return &Client{cfg: cfg, cli: cli}, err
+	return &Client{
+		cfg: cfg,
+		cli: cli,
+	}, err
 }
 
 // register
-func (m *Client) Register(s discov.Service) error {
-	return m.cli.Register(etcdv3.Service{
+func (c *Client) Register(s discov.Service) error {
+	return c.cli.Register(etcdv3.Service{
 		Key:   s.Key,
 		Value: s.Val,
 		TTL: etcdv3.NewTTLOption(
@@ -38,8 +41,8 @@ func (m *Client) Register(s discov.Service) error {
 }
 
 // Deregister
-func (m *Client) Deregister(s discov.Service) error {
-	return m.cli.Deregister(etcdv3.Service{
+func (c *Client) Deregister(s discov.Service) error {
+	return c.cli.Deregister(etcdv3.Service{
 		Key:   s.Key,
 		Value: s.Val,
 		TTL: etcdv3.NewTTLOption(
@@ -49,6 +52,6 @@ func (m *Client) Deregister(s discov.Service) error {
 	})
 }
 
-func (m *Client) NewInstancer(key string) (sd.Instancer, error) {
-	return etcdv3.NewInstancer(m.cli, key, zapx.KitL())
+func (c *Client) NewInstancer(key string) (sd.Instancer, error) {
+	return etcdv3.NewInstancer(c.cli, key, zapx.KitL())
 }

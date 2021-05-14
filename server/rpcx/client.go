@@ -18,7 +18,7 @@ func NewClient(cfg Config) *Client {
 func (c *Client) Invoker(key string) (*discov.Invoker, error) {
 	inv := discov.NewInvoker()
 	if c.cfg.Etcd.HaveEtcd() {
-		etcd, err := etcdx.NewEtcd(c.cfg.Etcd)
+		etcd, err := etcdx.NewClient(c.cfg.Etcd)
 		if err != nil {
 			return nil, err
 		}
@@ -27,8 +27,6 @@ func (c *Client) Invoker(key string) (*discov.Invoker, error) {
 			return nil, err
 		}
 		inv.Instancer(instancer)
-	} else {
-		inv.Address(c.cfg.Etcd.Hosts...)
 	}
 	return inv, nil
 }

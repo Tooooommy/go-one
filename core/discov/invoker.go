@@ -18,9 +18,10 @@ var (
 )
 
 type (
-	EncodeFunc     grpctranspot.EncodeRequestFunc
-	DecodeFunc     grpctranspot.DecodeResponseFunc
-	ConnectFactory func(string) (*grpc.ClientConn, error)
+	EncodeFunc       grpctranspot.EncodeRequestFunc
+	DecodeFunc       grpctranspot.DecodeResponseFunc
+	ConnectFactory   func(string) (*grpc.ClientConn, error)
+	DefaultInstancer sd.FixedInstancer
 
 	Invoker struct {
 		instancer sd.Instancer
@@ -31,7 +32,6 @@ type (
 		decode    DecodeFunc
 		max       int
 		timeout   int
-		address   []string
 		method    string
 		service   string
 		request   interface{}
@@ -93,12 +93,6 @@ func (i *Invoker) Connection(conn ConnectFactory) *Invoker {
 	return i
 }
 
-// Address
-func (i *Invoker) Address(addr ...string) *Invoker {
-	i.address = addr
-	return i
-}
-
 // Request
 func (i *Invoker) Request(request interface{}) {
 	i.request = request
@@ -128,10 +122,6 @@ func (i *Invoker) Service(service string) {
 
 // Endpoint
 func (i *Invoker) Endpoint() endpoint.Endpoint {
-	if i.instancer == nil {
-		i.instancer = sd.FixedInstancer(i.address)
-	}
-
 	endpointer := sd.NewEndpointer(i.instancer, i.factory, zapx.KitL())
 	balancer := lb.NewRoundRobin(endpointer)
 	if i.max > 0 && i.timeout > 0 {

@@ -7,20 +7,18 @@ import (
 
 type Config struct {
 	Hosts         []string `json:"hosts"`
-	Cert          string   `json:"cert"`
-	Key           string   `json:"key"`
-	CACert        string   `json:"ca_cert"`
+	CertFile      string   `json:"cert_file"`
+	KeyFile       string   `json:"key_file"`
 	DialTimeout   int64    `json:"dial_timeout"`
 	DialKeepAlive int64    `json:"dial_keep_alive"`
 	Username      string   `json:"username"`
 	Password      string   `json:"password"`
 }
 
-func (c Config) GetEtcdClientOptions() etcdv3.ClientOptions {
+func (c Config) ClientOptions() etcdv3.ClientOptions {
 	return etcdv3.ClientOptions{
-		Cert:          c.Cert,
-		Key:           c.Key,
-		CACert:        c.CACert,
+		Cert:          c.CertFile,
+		Key:           c.KeyFile,
 		DialTimeout:   time.Duration(c.DialTimeout),
 		DialKeepAlive: time.Duration(c.DialKeepAlive),
 		Username:      c.Username,

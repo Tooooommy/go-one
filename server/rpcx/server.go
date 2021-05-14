@@ -55,7 +55,7 @@ func (s *Server) Start() error {
 	}
 
 	if s.cfg.Etcd.HaveEtcd() {
-		cli, err := etcdx.NewEtcd(s.cfg.Etcd)
+		cli, err := etcdx.NewClient(s.cfg.Etcd)
 		if err != nil {
 			return err
 		}
