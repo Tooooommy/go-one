@@ -51,12 +51,14 @@ func (m *Metrics) Set(value float64) *Metrics {
 	return m
 }
 
-func (m *Metrics) Incr(value float64) {
+func (m *Metrics) Incr(value float64) *Metrics {
 	m.gauge.Add(value)
+	return m
 }
 
-func (m *Metrics) Decr(value float64) {
+func (m *Metrics) Decr(value float64) *Metrics {
 	m.gauge.Add(-value)
+	return m
 }
 
 // Observe
