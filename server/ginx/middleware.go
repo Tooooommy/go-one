@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-// Nop: 空中间件
-func Nop() gin.HandlerFunc {
+// NopHandler: 空中间件
+func NopHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 	}
