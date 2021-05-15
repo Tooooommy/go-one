@@ -1,17 +1,32 @@
 package main
 
 import (
-	user "github.com/Tooooommy/go-one/example/hello_rpc"
-	"google.golang.org/grpc"
-	"net"
+	"github.com/Tooooommy/go-one/server"
+	"github.com/Tooooommy/go-one/server/ginx"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	l, err := net.Listen("tcp", "127.0.0.1:8081")
+	router := gin.Default()
+	cfg := ginx.Config{
+		Config: server.Config{
+			Name: "go-one",
+			Host: "127.0.0.1",
+			Port: 8080,
+		},
+		MaxConns: 1000,
+		MaxBytes: 1000,
+		Timeout:  10000,
+	}
+
+	router.GET("/get")
+
+	svr := ginx.NewServer(
+		ginx.WithConfig(cfg),
+		ginx.WithGinEngine(router),
+	)
+	err := svr.Start()
 	if err != nil {
 		panic(err)
 	}
-	s := grpc.NewServer()
-	user.RegisterUserServer(s, &user.User{})
-	s.Serve(l)
 }

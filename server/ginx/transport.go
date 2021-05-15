@@ -66,17 +66,17 @@ func (s *Transport) Handle(e endpoint.Endpoint, resp interface{}) gin.HandlerFun
 	}
 }
 
-// NoHandler
-func (s *Transport) NoHandler(e endpoint.Endpoint) gin.HandlerFunc {
+// NoHandle
+func (s *Transport) NoHandle(e endpoint.Endpoint) gin.HandlerFunc {
 	return s.Decode(NoDecoder).Encode(NoEncoder).Handle(e, nil)
 }
 
-// JSONHandler
-func (s *Transport) JSONHandler(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
+// JSONHandle
+func (s *Transport) JSONHandle(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
 	return s.Decode(JSONDecoder).Encode(JSONEncoder).Handle(e, resp)
 }
 
-// FileHandler
-func (s *Transport) FileHandler(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
+// FileHandle
+func (s *Transport) FileHandle(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
 	return s.Decode(FileDecoder).Encode(JSONEncoder).Handle(e, resp)
 }

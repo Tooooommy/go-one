@@ -9,14 +9,14 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	conn, err := grpc.Dial("127.0.0.1:8081", grpc.WithInsecure())
+	conn, err := grpc.Dial("127.0.0.1:9443", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
 	defer conn.Close()
 
 	c := user.NewUserClient(conn)
-	resp, err := c.Ping(context.Background(), &user.Request{Ping: "pong"})
+	resp, err := c.Pong(context.Background(), &user.Request{Ping: "pong"})
 	if err != nil {
 		panic(err)
 	}

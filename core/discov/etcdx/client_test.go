@@ -17,7 +17,7 @@ func TestServer(t *testing.T) {
 		DialTimeout:   5 * time.Second,
 		DialKeepAlive: 5 * time.Second,
 	}
-	var host = "0.0.0.0:2479"
+	var host = "0.0.0.0:2379"
 	client, err := etcdv3.NewClient(context.Background(), []string{host}, options)
 	if err != nil {
 		panic(err)
