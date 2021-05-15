@@ -3,7 +3,6 @@ package ginx
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"net/http"
 )
@@ -51,8 +50,6 @@ func JSONDecoder(c *gin.Context, resp interface{}) httptransport.DecodeRequestFu
 // JSONEncoder
 func JSONEncoder(c *gin.Context) httptransport.EncodeResponseFunc {
 	return func(ctx context.Context, writer http.ResponseWriter, response interface{}) (err error) {
-		if f, ok := response.(endpoint.Failer); ok && f.Failed() != nil {
-		}
 		if response == nil {
 			err = ErrReturnIsNil
 			c.AbortWithStatus(http.StatusBadRequest)
