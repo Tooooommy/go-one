@@ -15,7 +15,6 @@ type (
 
 	// Transport
 	Transport struct {
-		options     []httptransport.ServerOption
 		middlewares []endpoint.Middleware
 		encode      EncodeFunc
 		decode      DecodeFunc
@@ -25,12 +24,6 @@ type (
 // NewTransport
 func NewTransport() *Transport {
 	return &Transport{}
-}
-
-// With
-func (s *Transport) With(options ...httptransport.ServerOption) *Transport {
-	s.options = append(s.options, options...)
-	return s
 }
 
 // Use
@@ -61,22 +54,7 @@ func (s *Transport) Handle(e endpoint.Endpoint, resp interface{}) gin.HandlerFun
 			e,
 			s.decode(c, resp),
 			s.encode(c),
-			s.options...,
+			// options
 		).ServeHTTP(c.Writer, c.Request)
 	}
-}
-
-// NoHandle
-func (s *Transport) NoHandle(e endpoint.Endpoint) gin.HandlerFunc {
-	return s.Decode(NoDecoder).Encode(NoEncoder).Handle(e, nil)
-}
-
-// JSONHandle
-func (s *Transport) JSONHandle(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
-	return s.Decode(JSONDecoder).Encode(JSONEncoder).Handle(e, resp)
-}
-
-// FileHandle
-func (s *Transport) FileHandle(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
-	return s.Decode(FileDecoder).Encode(JSONEncoder).Handle(e, resp)
 }
