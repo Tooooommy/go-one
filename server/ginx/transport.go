@@ -10,7 +10,7 @@ import (
 var ErrReturnIsNil = errors.New("return response is nil")
 
 type (
-	DecodeFunc func(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc
+	DecodeFunc func(c *gin.Context, response interface{}) httptransport.DecodeRequestFunc
 	EncodeFunc func(c *gin.Context) httptransport.EncodeResponseFunc
 
 	// Transport
