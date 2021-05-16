@@ -40,7 +40,7 @@ func NewJwtParser(cfg Config) endpoint.Middleware {
 	return parse([]byte(cfg.Secret), cfg.ValidRealIp, cfg.ValidDevice)
 }
 
-// NewJwtSigner: 生成JWTTOken
+// NewJwtSigner: 生成JWTToken
 func NewJwtSigner(cfg Config) endpoint.Middleware {
 	timeout := cfg.Timeout
 	if timeout <= 0 {
