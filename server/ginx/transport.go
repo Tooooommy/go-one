@@ -10,7 +10,7 @@ import (
 var ErrReturnIsNil = errors.New("return response is nil")
 
 type (
-	DecodeFunc func(c *gin.Context, response interface{}) httptransport.DecodeRequestFunc
+	DecodeFunc func(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc
 	EncodeFunc func(c *gin.Context) httptransport.EncodeResponseFunc
 
 	// Transport
@@ -45,14 +45,14 @@ func (s *Transport) Decode(dec DecodeFunc) *Transport {
 }
 
 // Handle
-func (s *Transport) Handle(e endpoint.Endpoint, resp interface{}) gin.HandlerFunc {
+func (s *Transport) Handle(e endpoint.Endpoint, request interface{}) gin.HandlerFunc {
 	for _, middleware := range s.middlewares {
 		e = middleware(e)
 	}
 	return func(c *gin.Context) {
 		httptransport.NewServer(
 			e,
-			s.decode(c, resp),
+			s.decode(c, request),
 			s.encode(c),
 		).ServeHTTP(c.Writer, c.Request)
 	}
