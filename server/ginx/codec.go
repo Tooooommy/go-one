@@ -7,13 +7,6 @@ import (
 	"net/http"
 )
 
-// JSONResponse
-type JSONResponse struct {
-	Code int         `json:"code"`
-	Msg  string      `json:"msg"`
-	Data interface{} `json:"data"`
-}
-
 // NoDecoder
 func NoDecoder(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc {
 	return func(ctx context.Context, req *http.Request) (interface{}, error) {

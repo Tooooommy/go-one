@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"net/http"
 )
 
 var ErrReturnIsNil = errors.New("return response is nil")
@@ -15,15 +16,23 @@ type (
 
 	// Transport
 	Transport struct {
+		options     []httptransport.ServerOption
 		middlewares []endpoint.Middleware
 		encode      EncodeFunc
 		decode      DecodeFunc
+		request     interface{}
 	}
 )
 
 // NewTransport
 func NewTransport() *Transport {
 	return &Transport{}
+}
+
+// With
+func (s *Transport) With(options ...httptransport.ServerOption) *Transport {
+	s.options = append(s.options, options...)
+	return s
 }
 
 // Use
@@ -39,7 +48,7 @@ func (s *Transport) Encode(enc EncodeFunc) *Transport {
 }
 
 // Decode
-func (s *Transport) Decode(dec DecodeFunc) *Transport {
+func (s *Transport) Decode(dec DecodeFunc, request interface{}) *Transport {
 	s.decode = dec
 	return s
 }
@@ -54,8 +63,12 @@ func (s *Transport) Handle(e endpoint.Endpoint, request interface{}) gin.Handler
 			e,
 			s.decode(c, request),
 			s.encode(c),
+			s.options...,
 		).ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func (s *Transport) ServerHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewHandler(e endpoint.Endpoint, resp interface{}, enc EncodeFunc, dec DecodeFunc, middlewares ...endpoint.Middleware) gin.HandlerFunc {
