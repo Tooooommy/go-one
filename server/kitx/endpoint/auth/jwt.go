@@ -23,12 +23,10 @@ const (
 )
 
 var (
-	ErrInvalidToken     = errors.New("token is invalid")
 	ErrInvalidClaims    = errors.New("claims is invalid")
 	ErrInvalidRealIp    = errors.New("real ip is invalid")
 	ErrInvalidDevice    = errors.New("device is invalid")
 	ErrInvalidKidHeader = errors.New("kid header is invalid")
-	ErrInvalidRefresh   = errors.New("refresh token is disable")
 )
 
 const (
