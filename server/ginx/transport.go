@@ -54,7 +54,15 @@ func (s *Transport) Handle(e endpoint.Endpoint, resp interface{}) gin.HandlerFun
 			e,
 			s.decode(c, resp),
 			s.encode(c),
-			// options
 		).ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func NewHandler(e endpoint.Endpoint, resp interface{}, enc EncodeFunc, dec DecodeFunc, middlewares ...endpoint.Middleware) gin.HandlerFunc {
+	transport := &Transport{
+		middlewares: middlewares,
+		encode:      enc,
+		decode:      dec,
+	}
+	return transport.Handle(e, resp)
 }
