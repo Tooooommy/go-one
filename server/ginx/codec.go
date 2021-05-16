@@ -2,6 +2,7 @@ package ginx
 
 import (
 	"context"
+	"github.com/Tooooommy/go-one/server"
 	"github.com/gin-gonic/gin"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"net/http"
@@ -47,7 +48,7 @@ func JSONEncoder(c *gin.Context) httptransport.EncodeResponseFunc {
 			err = ErrReturnIsNil
 			c.AbortWithStatus(http.StatusBadRequest)
 		} else {
-			c.JSON(http.StatusOK, response.(JSONResponse))
+			c.JSON(http.StatusOK, response.(server.JSONResponse))
 		}
 		return err
 	}
