@@ -1,66 +1,110 @@
 package ginx
 
 import (
-	"context"
-	"github.com/Tooooommy/go-one/server"
 	"github.com/gin-gonic/gin"
-	httptransport "github.com/go-kit/kit/transport/http"
 	"net/http"
 )
 
-// NoDecoder
-func NoDecoder(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc {
-	return func(ctx context.Context, req *http.Request) (interface{}, error) {
+func NopDecoder(request interface{}) DecodeFunc {
+	return func(context *gin.Context) (interface{}, error) {
 		return request, nil
 	}
 }
 
-// NoEncoder
-func NoEncoder(c *gin.Context) httptransport.EncodeResponseFunc {
-	return func(ctx context.Context, writer http.ResponseWriter, i interface{}) error {
-		return nil
+func ShouldDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBind(request)
+		return request, err
 	}
 }
 
-// JSONDecoder
-func JSONDecoder(c *gin.Context, request interface{}) httptransport.DecodeRequestFunc {
-	return func(ctx context.Context, req *http.Request) (interface{}, error) {
-		if err := c.BindHeader(request); err != nil {
-			return nil, err
-		}
-		if err := c.BindUri(request); err != nil {
-			return nil, err
-		}
-		if err := c.BindQuery(request); err != nil {
-			return nil, err
-		}
-		if err := c.ShouldBind(request); err != nil {
-			return nil, err
-		}
-		return request, nil
+func JSONDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBindJSON(request)
+		return request, err
 	}
 }
 
-// JSONEncoder
-func JSONEncoder(c *gin.Context) httptransport.EncodeResponseFunc {
-	return func(ctx context.Context, writer http.ResponseWriter, response interface{}) (err error) {
-		if response == nil {
-			err = ErrReturnIsNil
-			c.AbortWithStatus(http.StatusBadRequest)
-		} else {
-			c.JSON(http.StatusOK, response.(server.JSONResponse))
-		}
-		return err
+func XMLDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBindXML(request)
+		return request, err
 	}
 }
 
-// FileDecoder
-func FileDecoder(c *gin.Context, resp interface{}) httptransport.DecodeRequestFunc {
-	return func(ctx context.Context, req *http.Request) (interface{}, error) {
-		fs, err := c.MultipartForm()
-		if err != nil {
-			return nil, err
-		}
-		return fs.File["file"], nil
+func QueryDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBindQuery(request)
+		return request, err
 	}
+}
+
+func YAMLDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBindYAML(request)
+		return request, err
+	}
+}
+
+func HeaderDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBindHeader(request)
+		return request, err
+	}
+}
+
+func URIDecoder(request interface{}) DecodeFunc {
+	return func(ctx *gin.Context) (interface{}, error) {
+		err := ctx.ShouldBindUri(request)
+		return request, err
+	}
+}
+
+func NopEncoder(ctx *gin.Context, response interface{}) error {
+	return nil
+}
+
+func JSONEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.JSON(http.StatusOK, response)
+	return nil
+}
+
+func XMLEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.XML(http.StatusOK, response)
+	return nil
+}
+
+func YAMLEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.YAML(http.StatusOK, response)
+	return nil
+}
+
+func IndentedJSONEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.IndentedJSON(http.StatusOK, response)
+	return nil
+}
+
+func SecureJSONEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.SecureJSON(http.StatusOK, response)
+	return nil
+}
+
+func JSONPEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.SecureJSON(http.StatusOK, response)
+	return nil
+}
+
+func AsciiJSONEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.AsciiJSON(http.StatusOK, response)
+	return nil
+}
+
+func PureJSONEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.PureJSON(http.StatusOK, response)
+	return nil
+}
+
+func ProtoBufEncoder(ctx *gin.Context, response interface{}) error {
+	ctx.ProtoBuf(http.StatusOK, response)
+	return nil
 }

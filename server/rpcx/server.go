@@ -44,6 +44,16 @@ func WithRegister(reg *discov.Registry) ServerOption {
 	}
 }
 
+// Config
+func (s *Server) Config() Config {
+	return s.cfg
+}
+
+// Registry
+func (s *Server) Registry() *discov.Registry {
+	return s.reg
+}
+
 // Start
 func (s *Server) Start() error {
 	if s.cfg.HaveCert() { // 验证
