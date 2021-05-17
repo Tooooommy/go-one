@@ -9,7 +9,7 @@ type (
 	EncodeFunc grpctranspot.EncodeRequestFunc
 	DecodeFunc grpctranspot.DecodeResponseFunc
 
-	Transport struct {
+	Service struct {
 		options     []grpctranspot.ServerOption
 		middlewares []endpoint.Middleware
 		encode      EncodeFunc
@@ -17,37 +17,37 @@ type (
 	}
 )
 
-// NewTransport
-func NewTransport() *Transport {
-	return &Transport{}
+// NewService
+func NewService() *Service {
+	return &Service{}
 }
 
 // With
-func (s *Transport) With(options ...grpctranspot.ServerOption) *Transport {
+func (s *Service) With(options ...grpctranspot.ServerOption) *Service {
 	s.options = append(s.options, options...)
 	return s
 }
 
 // Use
-func (s *Transport) Use(middlewares ...endpoint.Middleware) *Transport {
+func (s *Service) Use(middlewares ...endpoint.Middleware) *Service {
 	s.middlewares = append(s.middlewares, middlewares...)
 	return s
 }
 
 // Encode
-func (s *Transport) Encode(enc EncodeFunc) *Transport {
+func (s *Service) Encode(enc EncodeFunc) *Service {
 	s.encode = enc
 	return s
 }
 
 // Decode
-func (s *Transport) Decode(dec DecodeFunc) *Transport {
+func (s *Service) Decode(dec DecodeFunc) *Service {
 	s.decode = dec
 	return s
 }
 
 // Handle
-func (s *Transport) Handle(e endpoint.Endpoint) grpctranspot.Handler {
+func (s *Service) Handle(e endpoint.Endpoint) grpctranspot.Handler {
 	for _, middleware := range s.middlewares {
 		e = middleware(e)
 	}

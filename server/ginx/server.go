@@ -31,8 +31,8 @@ func NewServer(options ...ServerOption) *Server {
 	return s
 }
 
-// WithGinEngine: 设置GinEngine
-func WithGinEngine(eng *gin.Engine) ServerOption {
+// WithEngine: 设置GinEngine
+func WithEngine(eng *gin.Engine) ServerOption {
 	return func(s *Server) {
 		s.eng = eng
 	}
