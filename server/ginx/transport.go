@@ -7,11 +7,11 @@ import (
 )
 
 type (
-	DecodeFunc  func(*gin.Context) (interface{}, error)
-	EncodeFunc  func(*gin.Context, interface{}) error
-	ErrorFunc   func(*gin.Context, error)
-	DecodeFuncs []DecodeFunc
-	Options     func(*ErrHandler)
+	DecodeFunc    func(*gin.Context) (interface{}, error)
+	EncodeFunc    func(*gin.Context, interface{}) error
+	ErrorFunc     func(*gin.Context, error)
+	DecodeFuncs   []DecodeFunc
+	ServiceOption func(*ErrHandler)
 
 	ErrHandler struct {
 		encodeErrHandler   ErrorFunc
@@ -25,7 +25,7 @@ func defaultHandleErr(ctx *gin.Context, err error) {
 	return
 }
 
-func NewService(e endpoint.Endpoint, decode DecodeFuncs, encode EncodeFunc, options ...Options) gin.HandlerFunc {
+func NewService(e endpoint.Endpoint, decode DecodeFuncs, encode EncodeFunc, options ...ServiceOption) gin.HandlerFunc {
 	errHandler := &ErrHandler{
 		encodeErrHandler:   defaultHandleErr,
 		decodeErrHandler:   defaultHandleErr,
@@ -60,5 +60,23 @@ func NewService(e endpoint.Endpoint, decode DecodeFuncs, encode EncodeFunc, opti
 			errHandler.encodeErrHandler(ctx, err)
 			return
 		}
+	}
+}
+
+func SetDecodeErrHandler(fn ErrorFunc) ServiceOption {
+	return func(handler *ErrHandler) {
+		handler.decodeErrHandler = fn
+	}
+}
+
+func SetEndpointErrHandler(fn ErrorFunc) ServiceOption {
+	return func(handler *ErrHandler) {
+		handler.endpointErrHandler = fn
+	}
+}
+
+func SetEncodeErrHandler(fn ErrorFunc) ServiceOption {
+	return func(handler *ErrHandler) {
+		handler.encodeErrHandler = fn
 	}
 }
