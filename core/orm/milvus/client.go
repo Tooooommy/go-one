@@ -3,8 +3,8 @@ package milvus
 import (
 	"context"
 	"errors"
-	"github.com/Tooooommy/go-one/core/task"
 	"github.com/milvus-io/milvus-sdk-go/milvus"
+	"strings"
 )
 
 var (
@@ -13,9 +13,7 @@ var (
 
 type (
 	Config struct {
-		Host         string `json:"host"`
-		Port         string `json:"port"`
-		PingDuration int64  `json:"ping_duration"`
+		Address string `json:"address"`
 	}
 
 	Client struct {
@@ -24,16 +22,21 @@ type (
 	}
 )
 
+func (cfg Config) DSN() string {
+	return cfg.Address
+}
+
 func (cfg Config) NewClient() (*Client, error) {
 	return NewClient(cfg)
 }
 
 func NewClient(cfg Config) (*Client, error) {
+	host, port := resolverAddr(cfg.Address)
 	cli, err := milvus.NewMilvusClient(
 		context.Background(),
 		milvus.ConnectParam{
-			IPAddress: cfg.Host,
-			Port:      cfg.Port,
+			IPAddress: host,
+			Port:      port,
 		},
 	)
 	if err != nil {
@@ -43,16 +46,27 @@ func NewClient(cfg Config) (*Client, error) {
 		cfg: cfg,
 		cli: cli,
 	}
-	client.ping()
-	return client, nil
+	err = client.Ping()
+	return client, err
 }
 
-func (c *Client) ping() {
-	go task.TickHandler(c.cfg.PingDuration, func() error {
-		if c.cli.IsConnected(context.Background()) == false {
-			c.cli = nil
-			return ErrMilvusPing
+func (c *Client) Ping() error {
+	if c.cli.IsConnected(context.Background()) == false {
+		return ErrMilvusPing
+	}
+	return nil
+}
+
+func resolverAddr(address string) (host, port string) {
+	ss := strings.Split(address, ":")
+	if len(ss) >= 2 {
+		host = ss[0]
+		port = ss[1]
+	} else if len(ss[0]) == 1 {
+		port = "19530"
+		if ss[0] == "" {
+			host = "localhost"
 		}
-		return nil
-	})
+	}
+	return
 }

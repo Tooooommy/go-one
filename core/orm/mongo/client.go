@@ -2,21 +2,17 @@ package mongo
 
 import (
 	"context"
-	"errors"
-	"github.com/Tooooommy/go-one/core/task"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"sync"
 	"time"
-)
-
-var (
-	ErrMongoPing = errors.New("mongo ping occurred error")
 )
 
 type Client struct {
 	cfg Config
-	cli *mongo.Client
+	orm *mongo.Client
+	one sync.Once
 }
 
 func NewClient(cfg Config) (*Client, error) {
@@ -26,23 +22,17 @@ func NewClient(cfg Config) (*Client, error) {
 	}
 	client := &Client{
 		cfg: cfg,
-		cli: cli,
+		orm: cli,
 	}
-	client.ping()
-	return client, nil
+	client.one.Do(func() {
+		err = client.Ping()
+	})
+	return client, err
 }
 
 // ping
-func (c *Client) ping() {
-	go task.TickHandler(c.cfg.PingDuration, func() error {
-		err := c.cli.Ping(context.Background(), readpref.Primary())
-		if err != nil {
-			c.cli = nil
-			return ErrMongoPing
-		}
-		return nil
-	})
-
+func (c *Client) Ping() error {
+	return c.orm.Ping(context.Background(), readpref.Primary())
 }
 
 // newMongoClient
@@ -58,5 +48,13 @@ func newMongoClient(cfg Config) (*mongo.Client, error) {
 		opt.SetMinPoolSize(cfg.MinPoolSize)
 	}
 
-	return mongo.Connect(context.Background(), opt)
+	return mongo.NewClient(opt)
+}
+
+func (c *Client) ORM() *mongo.Client {
+	return c.orm
+}
+
+func (c *Client) CFG() Config {
+	return c.cfg
 }

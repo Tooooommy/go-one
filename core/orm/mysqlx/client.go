@@ -2,14 +2,9 @@ package mysqlx
 
 import (
 	"database/sql"
-	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"sync"
 	"time"
-)
-
-var (
-	ErrMysqlPing = errors.New("mysql ping occurred error")
 )
 
 // Client
