@@ -5,10 +5,6 @@ import (
 	"sync"
 )
 
-var (
-	pool *Pool
-)
-
 // Pool
 type Pool struct {
 	Address string
@@ -35,14 +31,4 @@ func NewPool(address, apikey string) *Pool {
 			},
 		},
 	}
-}
-
-// InitPool
-func InitPool(address, apikey string) {
-	pool = NewPool(address, apikey)
-}
-
-// GlobalPool
-func GlobalPool() *Pool {
-	return pool
 }

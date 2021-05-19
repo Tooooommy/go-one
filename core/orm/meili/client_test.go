@@ -2,6 +2,7 @@ package meili
 
 import (
 	"fmt"
+	"github.com/meilisearch/meilisearch-go"
 	"testing"
 )
 
@@ -26,8 +27,8 @@ var movies = []Movies{
 }
 
 func TestInitPool(t *testing.T) {
-	InitPool("http://127.0.0.1:7700", "")
-	client := GlobalPool().Client()
+	p := NewPool("http://127.0.0.1:7700", "")
+	client := p.Get().(meilisearch.ClientInterface)
 	fmt.Println(client.Version())
 	update, err := client.Documents("movies").AddOrUpdate(movies)
 	if err != nil {

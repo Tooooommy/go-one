@@ -2,7 +2,8 @@ package mongo
 
 import (
 	"context"
-	"github.com/Tooooommy/go-one/core/zapx"
+	"errors"
+	"github.com/Tooooommy/go-one/core/task"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	global *Client
+	ErrMongoPing = errors.New("mongo ping occurred error")
 )
 
 type Client struct {
@@ -27,27 +28,21 @@ func NewClient(cfg Config) (*Client, error) {
 		cfg: cfg,
 		cli: cli,
 	}
-	go client.ping(cfg.PingDuration)
+	client.ping()
 	return client, nil
 }
 
 // ping
-func (c *Client) ping(duration int) {
-	defer func() {
-		if result := recover(); result != nil {
-			zapx.Error().Any("Recover Result", result).
-				Msg("mongo ping function recover")
-		}
-		c.ping(duration)
-	}()
-	for {
-		time.Sleep(time.Duration(duration) * time.Second)
+func (c *Client) ping() {
+	go task.TickHandler(c.cfg.PingDuration, func() error {
 		err := c.cli.Ping(context.Background(), readpref.Primary())
 		if err != nil {
-			c.cli, err = newMongoClient(c.cfg)
-			zapx.Error().Error(err).Msg("mongo database ping occurred error")
+			c.cli = nil
+			return ErrMongoPing
 		}
-	}
+		return nil
+	})
+
 }
 
 // newMongoClient
@@ -64,18 +59,4 @@ func newMongoClient(cfg Config) (*mongo.Client, error) {
 	}
 
 	return mongo.Connect(context.Background(), opt)
-}
-
-// Init
-func Init(client *Client) {
-	global = client
-}
-
-// global
-func Global() *Client {
-	return global
-}
-
-func GetMongoAuto() *mongo.Client {
-	return global.cli
 }

@@ -15,7 +15,7 @@ type Config struct {
 	MaxIdleConns    int    `json:"max_idle_conns"`
 	ConnMaxLifetime int    `json:"conn_max_lifetime"`
 	ConnMaxIdleTime int    `json:"conn_max_idle_time"`
-	PingDuration    int    `json:"ping_duration"`
+	PingDuration    int64  `json:"ping_duration"`
 }
 
 func (cfg Config) DSN() string {
@@ -47,6 +47,6 @@ func (cfg Config) DSN() string {
 		username, password, address, database, charset, loc, 10)
 }
 
-func (cfg Config) InitClient() (*Client, error) {
+func (cfg Config) NewClient() (*Client, error) {
 	return NewClient(cfg)
 }

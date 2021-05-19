@@ -13,7 +13,3 @@ func (p *Pool) Get() interface{} {
 func (p *Pool) Put(x interface{}) {
 	p.pool.Put(x)
 }
-
-func Global() meilisearch.ClientInterface {
-	return GlobalPool().Client()
-}

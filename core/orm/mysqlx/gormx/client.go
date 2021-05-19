@@ -10,18 +10,14 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var (
-	global *Client
-)
-
 type Client struct {
 	cfg mysqlx.Config
 	orm *gorm.DB
 }
 
 func Connect(client *mysqlx.Client) (*Client, error) {
-	cfg := client.Config()
-	db := client.DB()
+	cfg := client.CFG()
+	db := client.ORM()
 	log := logger.New(gormx.NewLogger(zapcore.InfoLevel), logger.Config{
 		SlowThreshold:             0,
 		Colorful:                  true,
@@ -52,14 +48,10 @@ func NewClient(cfg mysqlx.Config) (*Client, error) {
 	return Connect(cli)
 }
 
-func Init(client *Client) {
-	global = client
+func (c *Client) ORM() *gorm.DB {
+	return c.orm
 }
 
-func Global() *Client {
-	return global
-}
-
-func GetGroxAuto() *gorm.DB {
-	return global.orm
+func (c *Client) CFG() mysqlx.Config {
+	return c.cfg
 }

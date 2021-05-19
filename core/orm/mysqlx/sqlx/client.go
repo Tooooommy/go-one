@@ -5,18 +5,14 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-var (
-	global *Client
-)
-
 type Client struct {
 	cfg mysqlx.Config
 	orm *sqlx.DB
 }
 
 func Connect(client *mysqlx.Client) *Client {
-	cfg := client.Config()
-	raw := client.DB()
+	cfg := client.CFG()
+	raw := client.ORM()
 	orm := sqlx.NewDb(raw, "mysql")
 	return &Client{
 		cfg: cfg,
@@ -33,14 +29,10 @@ func NewClient(cfg mysqlx.Config) (*Client, error) {
 	return client, nil
 }
 
-func Init(client *Client) {
-	global = client
+func (c *Client) ORM() *sqlx.DB {
+	return c.orm
 }
 
-func Global() *Client {
-	return global
-}
-
-func GetSqlxAuto() *sqlx.DB {
-	return global.orm
+func (c *Client) CFG() mysqlx.Config {
+	return c.cfg
 }

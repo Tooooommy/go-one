@@ -2,47 +2,31 @@ package mysqlx
 
 import (
 	"database/sql"
-	"github.com/Tooooommy/go-one/core/zapx"
+	"errors"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
-	"gorm.io/gorm"
+	"sync"
 	"time"
 )
 
 var (
-	global *Client
-	gdb    *gorm.DB
-	xdb    *sqlx.DB
+	ErrMysqlPing = errors.New("mysql ping occurred error")
 )
 
 // Client
 type Client struct {
 	cfg Config
-	raw *sql.DB
+	orm *sql.DB
+	one sync.Once
 }
 
-// ping
-func (c *Client) ping(duration int) {
-	defer func() {
-		if result := recover(); result != nil {
-			zapx.Error().Any("Recover Result", result).
-				Msg("mysqlx ping function recover")
-		}
-		c.ping(duration)
-	}()
-	for {
-		time.Sleep(time.Duration(duration) * time.Second)
-		err := c.raw.Ping()
-		if err != nil {
-			c.raw = nil
-			zapx.Error().Error(err).Msg("mysqlx database ping occurred error")
-		}
-	}
+// Ping
+func (c *Client) Ping() error {
+	return c.orm.Ping()
 }
 
 // NewClient
 func NewClient(cfg Config) (*Client, error) {
-	db, err := sql.Open("mysqlx", cfg.DSN())
+	db, err := sql.Open("mysql", cfg.DSN())
 	if err != nil {
 		return nil, err
 	}
@@ -53,28 +37,20 @@ func NewClient(cfg Config) (*Client, error) {
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 	client := &Client{
 		cfg: cfg,
-		raw: db,
+		orm: db,
 	}
-	go client.ping(cfg.PingDuration)
-	return client, nil
+	client.one.Do(func() {
+		err = client.Ping()
+	})
+	return client, err
 }
 
-// DB
-func (c *Client) DB() *sql.DB {
-	return c.raw
+// ORM
+func (c *Client) ORM() *sql.DB {
+	return c.orm
 }
 
-// Config
-func (c *Client) Config() Config {
+// CFG
+func (c *Client) CFG() Config {
 	return c.cfg
-}
-
-// Init
-func Init(client *Client) {
-	global = client
-}
-
-// Global
-func Global() *Client {
-	return global
 }
