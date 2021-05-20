@@ -11,7 +11,6 @@ type Config struct {
 	Address         []string          `json:"address"`
 	Database        string            `json:"database"`
 	Options         map[string]string `json:"options"`
-	PingDuration    int64             `json:"ping_duration"`
 	MaxConnIdleTime int               `json:"max_conn_idle_time"`
 	MaxPoolSize     uint64            `json:"max_pool_size"`
 	MinPoolSize     uint64            `json:"min_pool_size"`

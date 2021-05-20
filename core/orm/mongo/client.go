@@ -24,9 +24,7 @@ func NewClient(cfg Config) (*Client, error) {
 		cfg: cfg,
 		orm: cli,
 	}
-	client.one.Do(func() {
-		err = client.Ping()
-	})
+	err = client.Ping()
 	return client, err
 }
 

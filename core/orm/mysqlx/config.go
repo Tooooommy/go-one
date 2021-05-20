@@ -15,7 +15,6 @@ type Config struct {
 	MaxIdleConns    int    `json:"max_idle_conns"`
 	ConnMaxLifetime int    `json:"conn_max_lifetime"`
 	ConnMaxIdleTime int    `json:"conn_max_idle_time"`
-	PingDuration    int64  `json:"ping_duration"`
 }
 
 func (cfg Config) DSN() string {
