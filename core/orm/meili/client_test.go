@@ -2,7 +2,6 @@ package meili
 
 import (
 	"fmt"
-	"github.com/meilisearch/meilisearch-go"
 	"testing"
 )
 
@@ -27,10 +26,15 @@ var movies = []Movies{
 }
 
 func TestInitPool(t *testing.T) {
-	p := NewPool("http://127.0.0.1:7700", "")
-	client := p.Get().(meilisearch.ClientInterface)
-	fmt.Println(client.Version())
-	update, err := client.Documents("movies").AddOrUpdate(movies)
+	client, err := GetCacheConn(Config{
+		Address: "127.0.0.1",
+		ApiKey:  "",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(client.ORM().Version())
+	update, err := client.ORM().Documents("movies").AddOrUpdate(movies)
 	if err != nil {
 		panic(err)
 	}

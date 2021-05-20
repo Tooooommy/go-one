@@ -31,9 +31,10 @@ func (cfg Config) NewClient() (*Client, error) {
 }
 
 func NewClient(cfg Config) (*Client, error) {
+	ctx := context.Background()
 	host, port := resolverAddr(cfg.Address)
 	cli, err := milvus.NewMilvusClient(
-		context.Background(),
+		ctx,
 		milvus.ConnectParam{
 			IPAddress: host,
 			Port:      port,
@@ -46,12 +47,12 @@ func NewClient(cfg Config) (*Client, error) {
 		cfg: cfg,
 		cli: cli,
 	}
-	err = client.Ping()
+	err = client.Ping(ctx)
 	return client, err
 }
 
-func (c *Client) Ping() error {
-	if c.cli.IsConnected(context.Background()) == false {
+func (c *Client) Ping(ctx context.Context) error {
+	if c.cli.IsConnected(ctx) == false {
 		return ErrMilvusPing
 	}
 	return nil
