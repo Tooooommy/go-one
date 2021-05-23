@@ -1,18 +1,18 @@
 package pubsub
 
-import "context"
-
 type (
-	MsgHandler func([]byte) error
+	//MsgHandler
+	MsgHandler func(interface{})
 
+	// Publisher
 	Publisher interface {
-		PublishSync(context.Context, []byte) (interface{}, error)
-		Publish([]byte) error
+		PublishSync([]byte) (interface{}, error)
+		Publish([]byte) (interface{}, error)
 	}
 
+	// Subscriber
 	Subscriber interface {
 		Subscribe(MsgHandler) error
 		Unsubscribe() error
-		Error() error
 	}
 )

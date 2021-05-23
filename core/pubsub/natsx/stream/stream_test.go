@@ -36,12 +36,12 @@ func TestJetStream(t *testing.T) {
 	checkErr(t, err)
 	// 创建stream流
 	err = createStream(js)
-	checkErr(t, err)
+	// checkErr(t, err)
 	// 通过发布消息创建订单
 	err = createOrder(js)
 	checkErr(t, err)
-	go TestPull(t)
-	// go TestSubscribe(t)
+	// go TestPull(t)
+	go TestSubscribe(t)
 	time.Sleep(10 * time.Second)
 }
 
@@ -65,13 +65,13 @@ func createOrder(js nats.JetStreamContext) error {
 
 // createStream 使用JetStreamContext创建流
 func createStream(js nats.JetStreamContext) error {
-	// Check if the ORDERS stream already exists; if not, create it.
+	// Check if the ORDERS ctx already exists; if not, create it.
 	stream, err := js.StreamInfo(streamName)
 	if err != nil {
 		log.Println(err)
 	}
 	if stream == nil {
-		log.Printf("creating stream %q and subjects %q", streamName, streamSubjects)
+		log.Printf("creating ctx %q and subjects %q", streamName, streamSubjects)
 		_, err = js.AddStream(&nats.StreamConfig{
 			Name:     streamName,
 			Subjects: []string{streamSubjects},

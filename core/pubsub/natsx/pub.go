@@ -1,28 +1,30 @@
 package natsx
 
 import (
-	"context"
 	"github.com/nats-io/nats.go"
+	"time"
 )
 
-type (
-	publisher struct {
-		subject string
-		reply   string
-		conn    *Conn
-	}
-)
+// publisher
+type publisher struct {
+	subject string
+	reply   string
+	timeout time.Duration
+	conn    *Conn
+}
 
-func (p *publisher) PublishSync(ctx context.Context, data []byte) (interface{}, error) {
-	return p.conn.PublishSync(ctx, &nats.Msg{
+// PublishSync
+func (p *publisher) PublishSync(data []byte) (interface{}, error) {
+	return p.conn.PublishSync(&nats.Msg{
 		Subject: p.subject,
 		Reply:   p.reply,
 		Data:    data,
-	})
+	}, p.timeout)
 }
 
-func (p *publisher) Publish(data []byte) error {
-	return p.conn.Publish(&nats.Msg{
+// Publish
+func (p *publisher) Publish(data []byte) (interface{}, error) {
+	return nil, p.conn.Publish(&nats.Msg{
 		Subject: p.subject,
 		Reply:   p.reply,
 		Data:    data,

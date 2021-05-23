@@ -1,18 +1,16 @@
 package natsx
 
 import (
-	"context"
 	"github.com/Tooooommy/go-one/core/pubsub"
 	"github.com/nats-io/nats.go"
 	"time"
 )
 
-type (
-	Conn struct {
-		cfg  Config
-		conn *nats.Conn
-	}
-)
+// Conn
+type Conn struct {
+	cfg  Config
+	conn *nats.Conn
+}
 
 // Connect
 func Connect(cfg Config) (*Conn, error) {
@@ -57,14 +55,13 @@ func (c Conn) CFG() Config {
 }
 
 // NewPublisher
-func (c *Conn) NewPublisher(subject string, reply string) pubsub.Publisher {
-	p := &publisher{conn: c, subject: subject, reply: reply}
-	return p
+func (c *Conn) NewPublisher(subject string, reply string, timeout time.Duration) pubsub.Publisher {
+	return &publisher{conn: c, subject: subject, reply: reply, timeout: timeout}
 }
 
 // Publish
-func (c *Conn) PublishSync(ctx context.Context, msg *nats.Msg) (*nats.Msg, error) {
-	return c.conn.RequestMsgWithContext(ctx, msg)
+func (c *Conn) PublishSync(msg *nats.Msg, timeout time.Duration) (*nats.Msg, error) {
+	return c.conn.RequestMsg(msg, timeout)
 }
 
 // PublishSync
@@ -73,7 +70,7 @@ func (c *Conn) Publish(msg *nats.Msg) error {
 }
 
 // NewSubscriber
-func (c *Conn) NewSubscriber(subject, queue string) *subscriber {
+func (c *Conn) NewSubscriber(subject, queue string) pubsub.Subscriber {
 	return &subscriber{conn: c, subject: subject, queue: queue}
 }
 
