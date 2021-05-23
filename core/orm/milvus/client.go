@@ -12,33 +12,40 @@ var (
 
 type Client struct {
 	cfg Config
-	cli milvus.MilvusClient
+	orm milvus.MilvusClient
 }
 
+// NewClient
 func NewClient(cfg Config) (*Client, error) {
 	ctx := context.Background()
 	host, port := resolverAddr(cfg.Address)
-	cli, err := milvus.NewMilvusClient(
-		ctx,
-		milvus.ConnectParam{
-			IPAddress: host,
-			Port:      port,
-		},
-	)
+	cli, err := milvus.NewMilvusClient(ctx,
+		milvus.ConnectParam{IPAddress: host, Port: port})
 	if err != nil {
 		return nil, err
 	}
 	client := &Client{
 		cfg: cfg,
-		cli: cli,
+		orm: cli,
 	}
 	err = client.Ping(ctx)
 	return client, err
 }
 
+// Ping
 func (c *Client) Ping(ctx context.Context) error {
-	if c.cli.IsConnected(ctx) == false {
+	if c.orm.IsConnected(ctx) == false {
 		return ErrMilvusPing
 	}
 	return nil
+}
+
+// ORM
+func (c *Client) ORM() milvus.MilvusClient {
+	return c.orm
+}
+
+// CFG
+func (c *Client) CFG() Config {
+	return c.cfg
 }

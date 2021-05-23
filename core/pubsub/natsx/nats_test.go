@@ -1,4 +1,4 @@
-package nats
+package natsx
 
 import (
 	"context"
@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-var subject = "go-one.nats.test"
+var subject = "go-one.natsx.test"
 var data = "hello world"
 
 func TestSubPub(t *testing.T) {
 
-	conn, err := nats.Connect("nats://127.0.0.1:4222", nats.Name(t.Name()))
+	conn, err := nats.Connect("natsx://127.0.0.1:4222", nats.Name(t.Name()))
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,4 +1,4 @@
-package nats
+package natsx
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	Subscriber struct {
+	subscriber struct {
 		subject string
 		queue   string
 		conn    *Conn
@@ -21,7 +21,7 @@ var (
 )
 
 // Subscribe
-func (s *Subscriber) Subscribe(cb pubsub.MsgHandler) error {
+func (s *subscriber) Subscribe(cb pubsub.MsgHandler) error {
 	sub, err := s.conn.Subscribe(s.subject, s.queue, func(msg *nats.Msg) {
 		defer msg.Ack()
 		err := cb(msg.Data)
@@ -34,7 +34,7 @@ func (s *Subscriber) Subscribe(cb pubsub.MsgHandler) error {
 }
 
 // Unsubscribe
-func (s *Subscriber) Unsubscribe() error {
+func (s *subscriber) Unsubscribe() error {
 	if s.sub == nil {
 		return UnsubscribeErr
 	}

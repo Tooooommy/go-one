@@ -40,6 +40,7 @@ func Connect(client *mysqlx.Client) (*Client, error) {
 	}, err
 }
 
+// NewClient
 func NewClient(cfg mysqlx.Config) (*Client, error) {
 	cli, err := mysqlx.NewClient(cfg)
 	if err != nil {
@@ -48,10 +49,20 @@ func NewClient(cfg mysqlx.Config) (*Client, error) {
 	return Connect(cli)
 }
 
+// ORM
 func (c *Client) ORM() *gorm.DB {
 	return c.orm
 }
 
+// CFG
 func (c *Client) CFG() mysqlx.Config {
 	return c.cfg
+}
+
+func (c *Client) Close() error {
+	db, err := c.orm.DB()
+	if err != nil {
+		return err
+	}
+	return db.Close()
 }

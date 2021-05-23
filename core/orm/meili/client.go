@@ -4,11 +4,10 @@ import (
 	"github.com/meilisearch/meilisearch-go"
 )
 
-// Pool
 type (
 	Client struct {
 		cfg Config
-		cli meilisearch.ClientInterface
+		orm meilisearch.ClientInterface
 	}
 )
 
@@ -21,14 +20,16 @@ func NewClient(cfg Config) (*Client, error) {
 	err := cli.Health().Get()
 	return &Client{
 		cfg: cfg,
-		cli: cli,
+		orm: cli,
 	}, err
 }
 
+// ORM
 func (c *Client) ORM() meilisearch.ClientInterface {
-	return c.cli
+	return c.orm
 }
 
+// CFG
 func (c *Client) CFG() Config {
 	return c.cfg
 }

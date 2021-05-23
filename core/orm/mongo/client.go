@@ -16,25 +16,6 @@ type Client struct {
 }
 
 func NewClient(cfg Config) (*Client, error) {
-	cli, err := newMongoClient(cfg)
-	if err != nil {
-		return nil, err
-	}
-	client := &Client{
-		cfg: cfg,
-		orm: cli,
-	}
-	err = client.Ping()
-	return client, err
-}
-
-// ping
-func (c *Client) Ping() error {
-	return c.orm.Ping(context.Background(), readpref.Primary())
-}
-
-// newMongoClient
-func newMongoClient(cfg Config) (*mongo.Client, error) {
 	opt := options.Client().ApplyURI(cfg.DSN())
 	if cfg.MaxConnIdleTime > 0 {
 		opt.SetMaxConnIdleTime(time.Duration(cfg.MaxConnIdleTime) * time.Millisecond)
@@ -46,7 +27,22 @@ func newMongoClient(cfg Config) (*mongo.Client, error) {
 		opt.SetMinPoolSize(cfg.MinPoolSize)
 	}
 
-	return mongo.NewClient(opt)
+	cli, err := mongo.NewClient(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &Client{
+		cfg: cfg,
+		orm: cli,
+	}
+	err = client.Ping()
+	return client, err
+}
+
+// ping
+func (c *Client) Ping() error {
+	return c.orm.Ping(context.Background(), readpref.Primary())
 }
 
 func (c *Client) ORM() *mongo.Client {

@@ -3,7 +3,6 @@ package mysqlx
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"sync"
 	"time"
 )
 
@@ -11,7 +10,6 @@ import (
 type Client struct {
 	cfg Config
 	orm *sql.DB
-	one sync.Once
 }
 
 // Ping
@@ -34,9 +32,7 @@ func NewClient(cfg Config) (*Client, error) {
 		cfg: cfg,
 		orm: db,
 	}
-	client.one.Do(func() {
-		err = client.Ping()
-	})
+	err = client.Ping()
 	return client, err
 }
 
@@ -48,4 +44,8 @@ func (c *Client) ORM() *sql.DB {
 // CFG
 func (c *Client) CFG() Config {
 	return c.cfg
+}
+
+func (c *Client) Close() error {
+	return c.orm.Close()
 }

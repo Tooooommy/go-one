@@ -10,6 +10,7 @@ type Client struct {
 	orm *sqlx.DB
 }
 
+// Connect
 func Connect(client *mysqlx.Client) *Client {
 	cfg := client.CFG()
 	raw := client.ORM()
@@ -20,6 +21,7 @@ func Connect(client *mysqlx.Client) *Client {
 	}
 }
 
+// NewClient
 func NewClient(cfg mysqlx.Config) (*Client, error) {
 	cli, err := mysqlx.NewClient(cfg)
 	if err != nil {
@@ -29,10 +31,17 @@ func NewClient(cfg mysqlx.Config) (*Client, error) {
 	return client, nil
 }
 
+// ORM
 func (c *Client) ORM() *sqlx.DB {
 	return c.orm
 }
 
+// CFG
 func (c *Client) CFG() mysqlx.Config {
 	return c.cfg
+}
+
+// Close
+func (c *Client) Close() error {
+	return c.orm.Close()
 }

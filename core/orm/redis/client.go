@@ -17,10 +17,11 @@ type (
 	}
 	Client struct {
 		cfg Config
-		cli Node
+		orm Node
 	}
 )
 
+// NewClient
 func NewClient(cfg Config) (*Client, error) {
 	var cli Node
 	switch cfg.RedisType {
@@ -50,20 +51,28 @@ func NewClient(cfg Config) (*Client, error) {
 
 	client := &Client{
 		cfg: cfg,
-		cli: cli,
+		orm: cli,
 	}
 	err := client.Ping(context.Background())
 	return client, err
 }
 
+// Ping
 func (c *Client) Ping(ctx context.Context) error {
-	return c.cli.Ping(ctx).Err()
+	return c.orm.Ping(ctx).Err()
 }
 
+// ORM
 func (c *Client) ORM() Node {
-	return c.cli
+	return c.orm
 }
 
+// CFG
 func (c *Client) CFG() Config {
 	return c.cfg
+}
+
+// Close
+func (c *Client) Close() error {
+	return c.orm.Close()
 }
