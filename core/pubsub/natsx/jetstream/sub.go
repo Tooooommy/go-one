@@ -1,4 +1,4 @@
-package stream
+package jetstream
 
 import (
 	"errors"
@@ -11,6 +11,7 @@ type subscriber struct {
 	subject string
 	queue   string
 	sub     *nats.Subscription
+	opts    []nats.SubOpt
 }
 
 var (
@@ -18,7 +19,7 @@ var (
 )
 
 func (s *subscriber) Subscribe(cb pubsub.MsgHandler) error {
-	sub, err := s.stream.Subscribe(s.subject, s.queue, func(msg *nats.Msg) { cb(msg) })
+	sub, err := s.stream.Subscribe(s.subject, s.queue, func(msg *nats.Msg) { cb(msg) }, s.opts...)
 	s.sub = sub
 	return err
 }
