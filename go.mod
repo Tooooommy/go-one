@@ -3,7 +3,9 @@ module github.com/Tooooommy/go-one
 go 1.16
 
 require (
+	github.com/DataDog/zstd v1.3.6-0.20190409195224-796139022798 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
+	github.com/Shopify/sarama v1.29.0 // indirect
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
@@ -56,6 +58,10 @@ require (
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	google.golang.org/genproto v0.0.0-20210518161634-ec7691c0a37d // indirect
 	google.golang.org/grpc v1.37.0
+	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
+	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
+	gopkg.in/jcmturner/gokrb5.v7 v7.2.3 // indirect
+	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/gorm v1.21.9
