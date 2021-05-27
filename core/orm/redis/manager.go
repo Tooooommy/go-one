@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	manager = syncx.NewConnManger()
+	manager = syncx.NewManger()
 )
 
 func GetCacheConn(cfg Config) (*Client, error) {

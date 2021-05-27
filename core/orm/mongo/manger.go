@@ -3,7 +3,7 @@ package mongo
 import "github.com/Tooooommy/go-one/core/syncx"
 
 var (
-	manager = syncx.NewConnManger()
+	manager = syncx.NewManger()
 )
 
 // GetCacheConn

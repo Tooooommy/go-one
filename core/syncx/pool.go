@@ -25,8 +25,8 @@ type (
 		close    func(interface{}) error
 		ping     func(interface{}) error
 		idleTime time.Duration
-		maxConn  int32 // 最大连接数
-		openConn int32 // 连接数
+		maxConn  int64 // 最大连接数
+		openConn int64 // 连接数
 	}
 
 	conn struct {
@@ -36,16 +36,16 @@ type (
 )
 
 var (
-	defaultPoolValue = 5
-	ErrClosed        = errors.New("pool is closed")
+	defaultValue int64 = 5
+	ErrClosed          = errors.New("pool is closed")
 )
 
 func NewPool(options ...PoolOption) (Pool, error) {
-
+	defaultDuration := time.Duration(defaultValue) * time.Second
 	p := &pool{
-		idleTime: time.Duration(defaultPoolValue) * time.Second, // 空闲时间
-		maxConn:  int32(defaultPoolValue),
-		openConn: int32(defaultPoolValue),
+		idleTime: defaultDuration, // 空闲时间
+		maxConn:  defaultValue,
+		openConn: defaultValue,
 	}
 	for _, option := range options {
 		option(p)
@@ -73,25 +73,25 @@ func NewPool(options ...PoolOption) (Pool, error) {
 	return p, nil
 }
 
-func SetFactory(factory func() (interface{}, error)) PoolOption {
+func SetPoolFactory(factory func() (interface{}, error)) PoolOption {
 	return func(p *pool) {
 		p.factory = factory
 	}
 }
 
-func SetClose(close func(interface{}) error) PoolOption {
+func SetPoolClose(close func(interface{}) error) PoolOption {
 	return func(p *pool) {
 		p.close = close
 	}
 }
 
-func SetPing(ping func(interface{}) error) PoolOption {
+func SetPoolPing(ping func(interface{}) error) PoolOption {
 	return func(p *pool) {
 		p.ping = ping
 	}
 }
 
-func SetIdleTime(idleTime time.Duration) PoolOption {
+func SetPoolIdleTime(idleTime time.Duration) PoolOption {
 	return func(p *pool) {
 		if idleTime > 0 {
 			p.idleTime = idleTime
@@ -99,7 +99,7 @@ func SetIdleTime(idleTime time.Duration) PoolOption {
 	}
 }
 
-func SetMaxCoon(max int32) PoolOption {
+func SetPoolMaxCoon(max int64) PoolOption {
 	return func(p *pool) {
 		if max > 0 {
 			p.maxConn = max
@@ -107,7 +107,7 @@ func SetMaxCoon(max int32) PoolOption {
 	}
 }
 
-func SetOpenConn(open int32) PoolOption {
+func SetPoolOpenConn(open int64) PoolOption {
 	return func(p *pool) {
 		if open > 0 {
 			p.openConn = open
@@ -123,6 +123,7 @@ func (p *pool) getConn() chan *conn {
 	return conn
 }
 
+// Get 获取连接
 func (p *pool) Get() (interface{}, error) {
 	conn := p.getConn()
 	if conn == nil {
@@ -151,7 +152,7 @@ func (p *pool) Get() (interface{}, error) {
 			if err != nil {
 				return nil, err
 			}
-			atomic.AddInt32(&p.openConn, 1)
+			atomic.AddInt64(&p.openConn, 1)
 			p.openConn++
 			return c, nil
 		}
@@ -168,7 +169,7 @@ func (p *pool) Put(c interface{}) error {
 
 	select {
 	case p.conn <- &conn{conn: c, idle: time.Now()}:
-		atomic.AddInt32(&p.openConn, 1)
+		atomic.AddInt64(&p.openConn, 1)
 		return nil
 	default:
 		return p.Close(c)
@@ -182,8 +183,7 @@ func (p *pool) Close(c interface{}) error {
 	if c == nil {
 		return errors.New("connection is nil, rejecting")
 	}
-	atomic.AddInt32(&p.openConn, -1)
-
+	atomic.AddInt64(&p.openConn, -1)
 	if p.close == nil {
 		return nil
 	}

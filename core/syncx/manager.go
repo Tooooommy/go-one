@@ -9,7 +9,7 @@ type Manager struct {
 	m sync.Map
 }
 
-func NewConnManger() *Manager {
+func NewManger() *Manager {
 	return &Manager{}
 }
 
