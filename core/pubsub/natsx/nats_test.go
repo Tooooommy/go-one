@@ -20,6 +20,7 @@ func TestSubPub(t *testing.T) {
 	}
 
 	sub(t, conn, "test1")
+	noAckSub(t, conn, "test2")
 
 	msg, err := conn.RequestMsgWithContext(
 		context.Background(),
@@ -46,6 +47,17 @@ func sub(t *testing.T, conn *nats.Conn, name string) {
 		if err != nil {
 			t.Error(err)
 		}
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+}
+
+func noAckSub(t *testing.T, conn *nats.Conn, name string) {
+	_, err := conn.Subscribe(subject, func(msg *nats.Msg) {
+		log.Println("-------name---------", name)
+		log.Println("-------msg----------", string(msg.Data))
 	})
 	if err != nil {
 		t.Error(err)
