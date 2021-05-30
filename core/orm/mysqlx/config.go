@@ -18,13 +18,17 @@ type Config struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Username: "root",
-		Password: "root",
-		Database: "master",
-		Address:  "127.0.0.1:3306",
-		Charset:  "utf8mb4",
-		Loc:      "Local",
-		Timeout:  10,
+		Username:        "root",
+		Password:        "root",
+		Database:        "master",
+		Address:         "127.0.0.1:3306",
+		Charset:         "utf8mb4",
+		Loc:             "Local",
+		Timeout:         10,
+		MaxOpenConns:    64,
+		MaxIdleConns:    64,
+		ConnMaxLifetime: 60,
+		ConnMaxIdleTime: 60,
 	}
 }
 

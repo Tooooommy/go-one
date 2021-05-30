@@ -32,8 +32,8 @@ func DefaultConfig() *Config {
 		Address:     []string{"127.0.0.1:6379"},
 		Database:    0,
 		MaxRetries:  3,
-		PoolSize:    10,
-		MinIdleConn: 3,
+		PoolSize:    100,
+		MinIdleConn: 64,
 		Limit:       0,
 	}
 }

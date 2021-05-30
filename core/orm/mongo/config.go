@@ -16,22 +16,24 @@ type Config struct {
 	MinPoolSize     uint64            `json:"min_pool_size"`
 }
 
-func (cfg *Config) DSN() string {
-	username := cfg.Username
-	password := cfg.Password
-	address := strings.Join(cfg.Address, ",")
-	database := "test"
+func DefaultConfig() *Config {
+	return &Config{
+		Username:        "admin",
+		Password:        "admin",
+		Address:         []string{"127.0.0.1:27017"},
+		Database:        "test",
+		MaxConnIdleTime: 60,
+		MaxPoolSize:     100,
+		MinPoolSize:     10,
+	}
+}
 
-	if len(cfg.Address) <= 0 {
-		address = "127.0.0.1:27017"
-	}
-	if cfg.Database != "" {
-		database = cfg.Database
-	}
+func (cfg *Config) DSN() string {
+	address := strings.Join(cfg.Address, ",")
 	var opts []string
 	for k, v := range cfg.Options {
 		opts = append(opts, k+"="+v)
 	}
 	opt := strings.Join(opts, "&")
-	return fmt.Sprintf("mongdb://%s:%s@%s/%s?%s", username, password, address, database, opt)
+	return fmt.Sprintf("mongdb://%s:%s@%s/%s?%s", cfg.Username, cfg.Password, address, cfg.Database, opt)
 }
