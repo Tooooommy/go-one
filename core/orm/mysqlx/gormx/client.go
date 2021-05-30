@@ -11,7 +11,7 @@ import (
 )
 
 type Client struct {
-	cfg mysqlx.Config
+	cfg *mysqlx.Config
 	orm *gorm.DB
 }
 
@@ -41,7 +41,7 @@ func Connect(client *mysqlx.Client) (*Client, error) {
 }
 
 // NewClient
-func NewClient(cfg mysqlx.Config) (*Client, error) {
+func NewClient(cfg *mysqlx.Config) (*Client, error) {
 	cli, err := mysqlx.NewClient(cfg)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (c *Client) ORM() *gorm.DB {
 }
 
 // CFG
-func (c *Client) CFG() mysqlx.Config {
+func (c *Client) CFG() *mysqlx.Config {
 	return c.cfg
 }
 

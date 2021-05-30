@@ -46,7 +46,7 @@ func NewZapx(options ...Option) {
 	zap.ReplaceGlobals(_zapx.log)()
 }
 
-func SetStdMode(cfg StdModeConfig) Option {
+func SetStdMode(cfg *StdModeConfig) Option {
 	return func(zapx *Zapx) {
 		l := zap.NewAtomicLevelAt(zapcore.Level(cfg.Level))
 		w := zapcore.AddSync(os.Stdout)
@@ -58,7 +58,7 @@ func SetStdMode(cfg StdModeConfig) Option {
 	}
 }
 
-func SetLogMode(cfg LogModeConfig) Option {
+func SetLogMode(cfg *LogModeConfig) Option {
 	return func(zapx *Zapx) {
 		l := zap.NewAtomicLevelAt(zapcore.Level(cfg.Level))
 		w := zapcore.AddSync(&lumberjack.Logger{
@@ -77,7 +77,7 @@ func SetLogMode(cfg LogModeConfig) Option {
 	}
 }
 
-func SetElkMode(cfg ElkModeConfig) Option {
+func SetElkMode(cfg *ElkModeConfig) Option {
 	return func(zapx *Zapx) {
 	}
 }

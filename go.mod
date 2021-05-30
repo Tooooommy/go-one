@@ -3,10 +3,10 @@ module github.com/Tooooommy/go-one
 go 1.16
 
 require (
-	github.com/DataDog/zstd v1.3.6-0.20190409195224-796139022798 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
 	github.com/Shopify/sarama v1.29.0 // indirect
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
+	github.com/apache/pulsar-client-go v0.5.0 // indirect
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

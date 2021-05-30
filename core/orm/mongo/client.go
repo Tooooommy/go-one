@@ -9,11 +9,11 @@ import (
 )
 
 type Client struct {
-	cfg Config
+	cfg *Config
 	orm *mongo.Client
 }
 
-func NewClient(cfg Config) (*Client, error) {
+func NewClient(cfg *Config) (*Client, error) {
 	opt := options.Client().ApplyURI(cfg.DSN())
 	if cfg.MaxConnIdleTime > 0 {
 		opt.SetMaxConnIdleTime(time.Duration(cfg.MaxConnIdleTime) * time.Millisecond)
@@ -47,6 +47,6 @@ func (c *Client) ORM() *mongo.Client {
 	return c.orm
 }
 
-func (c *Client) CFG() Config {
+func (c *Client) CFG() *Config {
 	return c.cfg
 }

@@ -8,7 +8,7 @@ import (
 
 // Client
 type Client struct {
-	cfg Config
+	cfg *Config
 	orm *sql.DB
 }
 
@@ -18,7 +18,7 @@ func (c *Client) Ping() error {
 }
 
 // NewClient
-func NewClient(cfg Config) (*Client, error) {
+func NewClient(cfg *Config) (*Client, error) {
 	db, err := sql.Open("mysql", cfg.DSN())
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (c *Client) ORM() *sql.DB {
 }
 
 // CFG
-func (c *Client) CFG() Config {
+func (c *Client) CFG() *Config {
 	return c.cfg
 }
 

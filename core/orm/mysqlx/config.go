@@ -17,7 +17,7 @@ type Config struct {
 	ConnMaxIdleTime int    `json:"conn_max_idle_time"`
 }
 
-func (cfg Config) DSN() string {
+func (cfg *Config) DSN() string {
 	username := cfg.Username
 	password := cfg.Password
 	database := cfg.Database
@@ -46,6 +46,6 @@ func (cfg Config) DSN() string {
 		username, password, address, database, charset, loc, 10)
 }
 
-func (cfg Config) NewClient() (*Client, error) {
+func (cfg *Config) NewClient() (*Client, error) {
 	return NewClient(cfg)
 }

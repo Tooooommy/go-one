@@ -13,13 +13,13 @@ type (
 	client etcdv3.Client
 	// Client
 	Client struct {
-		cfg Config
+		cfg *Config
 		cli client
 	}
 )
 
 // NewClient
-func NewClient(cfg Config) (*Client, error) {
+func NewClient(cfg *Config) (*Client, error) {
 	options := cfg.ClientOptions()
 	cli, err := etcdv3.NewClient(context.Background(), cfg.Hosts, options)
 	return &Client{

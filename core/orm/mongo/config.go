@@ -16,7 +16,7 @@ type Config struct {
 	MinPoolSize     uint64            `json:"min_pool_size"`
 }
 
-func (cfg Config) DSN() string {
+func (cfg *Config) DSN() string {
 	username := cfg.Username
 	password := cfg.Password
 	address := strings.Join(cfg.Address, ",")

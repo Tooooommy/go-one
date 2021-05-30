@@ -15,7 +15,7 @@ type Config struct {
 	Password      string   `json:"password"`
 }
 
-func (c Config) ClientOptions() etcdv3.ClientOptions {
+func (c *Config) ClientOptions() etcdv3.ClientOptions {
 	return etcdv3.ClientOptions{
 		Cert:          c.CertFile,
 		Key:           c.KeyFile,

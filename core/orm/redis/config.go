@@ -25,12 +25,12 @@ type (
 	}
 )
 
-func (cfg Config) DSN() string {
+func (cfg *Config) DSN() string {
 	address := cfg.Address[0]
 	return fmt.Sprintf("redis://%s:%s@%s/%d", cfg.Username, cfg.Password, address, cfg.Database)
 }
 
-func (cfg Config) TLSConfig() *tls.Config {
+func (cfg *Config) TLSConfig() *tls.Config {
 	return &tls.Config{
 		InsecureSkipVerify: true,
 	}

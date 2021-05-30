@@ -15,14 +15,15 @@ type (
 		redis.Scripter
 		redis.UniversalClient
 	}
+
 	Client struct {
-		cfg Config
+		cfg *Config
 		orm Node
 	}
 )
 
 // NewClient
-func NewClient(cfg Config) (*Client, error) {
+func NewClient(cfg *Config) (*Client, error) {
 	var cli Node
 	switch cfg.RedisType {
 	case NodeType:
@@ -68,7 +69,7 @@ func (c *Client) ORM() Node {
 }
 
 // CFG
-func (c *Client) CFG() Config {
+func (c *Client) CFG() *Config {
 	return c.cfg
 }
 

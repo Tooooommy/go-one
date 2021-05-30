@@ -6,14 +6,14 @@ import (
 
 type (
 	Client struct {
-		cfg Config
+		cfg *Config
 		orm meili.ClientInterface
 	}
 	ClientOption func(*Config)
 )
 
 // NewClient
-func NewClient(cfg Config) (*Client, error) {
+func NewClient(cfg *Config) (*Client, error) {
 	cli := meili.NewClient(meili.Config{
 		Host:   cfg.Address,
 		APIKey: cfg.ApiKey,
@@ -31,6 +31,6 @@ func (c *Client) ORM() meili.ClientInterface {
 }
 
 // CFG
-func (c *Client) CFG() Config {
+func (c *Client) CFG() *Config {
 	return c.cfg
 }
