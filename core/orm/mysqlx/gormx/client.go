@@ -15,38 +15,31 @@ type Client struct {
 	orm *gorm.DB
 }
 
-func Connect(client *mysqlx.Client) (*Client, error) {
+func Connect(client *mysqlx.Client, tablePrefix string) (*Client, error) {
 	cfg := client.CFG()
 	db := client.ORM()
-	log := logger.New(gormx.NewLogger(zapcore.InfoLevel), logger.Config{
-		SlowThreshold:             0,
-		Colorful:                  true,
-		IgnoreRecordNotFoundError: true,
-		LogLevel:                  logger.Info,
-	})
-	orm, err := gorm.Open(mysql.New(mysql.Config{
-		DriverName: "mysqlx",
-		Conn:       db,
-	}), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: cfg.Prefix,
+
+	log := logger.New(
+		gormx.NewLogger(zapcore.InfoLevel),
+		logger.Config{
+			SlowThreshold:             0,
+			Colorful:                  true,
+			IgnoreRecordNotFoundError: true,
+			LogLevel:                  logger.Info,
 		},
-		Logger:   log,
-		ConnPool: db,
-	})
+	)
+
+	orm, err := gorm.Open(
+		mysql.New(mysql.Config{DriverName: "mysql", Conn: db}),
+		&gorm.Config{
+			NamingStrategy: schema.NamingStrategy{TablePrefix: tablePrefix},
+			Logger:         log,
+			ConnPool:       db,
+		})
 	return &Client{
 		cfg: cfg,
 		orm: orm,
 	}, err
-}
-
-// NewClient
-func NewClient(cfg *mysqlx.Config) (*Client, error) {
-	cli, err := mysqlx.NewClient(cfg)
-	if err != nil {
-		return nil, err
-	}
-	return Connect(cli)
 }
 
 // ORM

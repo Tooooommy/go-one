@@ -21,16 +21,6 @@ func Connect(client *mysqlx.Client) *Client {
 	}
 }
 
-// NewClient
-func NewClient(cfg *mysqlx.Config) (*Client, error) {
-	cli, err := mysqlx.NewClient(cfg)
-	if err != nil {
-		return nil, err
-	}
-	client := Connect(cli)
-	return client, nil
-}
-
 // ORM
 func (c *Client) ORM() *sqlx.DB {
 	return c.orm
