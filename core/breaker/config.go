@@ -16,6 +16,17 @@ type Config struct {
 	ReqVolThreshold int    `json:"req_vol_threshold"` // 波动期内最小请求数
 }
 
+func DefaultConfig() *Config {
+	return &Config{
+		Name:            "go-one",
+		Timeout:         5,
+		MaxRequests:     5,
+		Interval:        0,
+		ErrPerThreshold: 60,
+		ReqVolThreshold: 5,
+	}
+}
+
 func readyToTrip(errPerThreshold int) func(counts gobreaker.Counts) bool {
 	if errPerThreshold > 0 {
 		return func(counts gobreaker.Counts) bool {

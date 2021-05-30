@@ -1,19 +1,20 @@
 package meili
 
 import (
-	"github.com/meilisearch/meilisearch-go"
+	meili "github.com/meilisearch/meilisearch-go"
 )
 
 type (
 	Client struct {
 		cfg Config
-		orm meilisearch.ClientInterface
+		orm meili.ClientInterface
 	}
+	ClientOption func(*Config)
 )
 
 // NewClient
 func NewClient(cfg Config) (*Client, error) {
-	cli := meilisearch.NewClient(meilisearch.Config{
+	cli := meili.NewClient(meili.Config{
 		Host:   cfg.Address,
 		APIKey: cfg.ApiKey,
 	})
@@ -25,7 +26,7 @@ func NewClient(cfg Config) (*Client, error) {
 }
 
 // ORM
-func (c *Client) ORM() meilisearch.ClientInterface {
+func (c *Client) ORM() meili.ClientInterface {
 	return c.orm
 }
 

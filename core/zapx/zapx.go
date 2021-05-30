@@ -16,7 +16,7 @@ func init() {
 type Zapx struct {
 	log *zap.Logger
 	sug *zap.SugaredLogger
-	cfg Config
+	cfg *Config
 }
 
 type Option func(*Zapx)
@@ -34,7 +34,7 @@ func NewZapx(options ...Option) {
 	_zapx = &Zapx{
 		log: l,
 		sug: l.Sugar(),
-		cfg: Config{},
+		cfg: &Config{},
 	}
 	for _, opt := range options {
 		opt(_zapx)
@@ -54,7 +54,7 @@ func SetStdMode(cfg StdModeConfig) Option {
 		c.EncodeTime = zapcore.ISO8601TimeEncoder
 		core := zapcore.NewCore(zapcore.NewJSONEncoder(c), w, l)
 		_zapx.log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-		_zapx.cfg = cfg.Config
+		_zapx.cfg = &cfg.Config
 	}
 }
 
@@ -73,7 +73,7 @@ func SetLogMode(cfg LogModeConfig) Option {
 		c.EncodeTime = zapcore.ISO8601TimeEncoder
 		core := zapcore.NewCore(zapcore.NewJSONEncoder(c), w, l)
 		_zapx.log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-		_zapx.cfg = cfg.Config
+		_zapx.cfg = &cfg.Config
 	}
 }
 

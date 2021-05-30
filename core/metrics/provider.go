@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	kitmetrics "github.com/go-kit/kit/metrics"
+	"github.com/go-kit/kit/metrics"
 	kitprovider "github.com/go-kit/kit/metrics/provider"
 )
 
@@ -10,77 +10,37 @@ import (
 type (
 	// Metrics
 	Metrics struct {
-		provider  kitprovider.Provider
-		counter   kitmetrics.Counter
-		gauge     kitmetrics.Gauge
-		histogram kitmetrics.Histogram
+		provider kitprovider.Provider
 	}
 )
 
 // NewMetrics
-func NewMetrics(namespace, subsystem, name string) *Metrics {
+func NewMetrics(namespace, subsystem string) *Metrics {
 	provider := kitprovider.NewExpvarProvider()
 	if len(namespace) != 0 && len(subsystem) != 0 {
 		provider = kitprovider.NewPrometheusProvider(namespace, subsystem)
 	}
-	counter := provider.NewCounter(name)
-	gauge := provider.NewGauge(name)
-	histogram := provider.NewHistogram(name, 50)
 	return &Metrics{
-		provider:  provider,
-		counter:   counter,
-		gauge:     gauge,
-		histogram: histogram,
+		provider: provider,
 	}
 }
 
-// With
-func (m *Metrics) With(labelValues ...string) *Metrics {
-	m.counter = m.counter.With(labelValues...)
-	m.gauge = m.gauge.With(labelValues...)
-	m.histogram = m.histogram.With(labelValues...)
-	return m
+// NewCounter
+func (m *Metrics) NewCounter(name string) metrics.Counter {
+	return m.provider.NewCounter(name)
 }
 
-// Add
-func (m *Metrics) Add(delta float64) *Metrics {
-	m.counter.Add(delta)
-	return m
+// NewGauge
+func (m *Metrics) NewGauge(name string) metrics.Gauge {
+	return m.provider.NewGauge(name)
 }
 
-// Metrics
-func (m *Metrics) Set(value float64) *Metrics {
-	m.gauge.Set(value)
-	return m
+// NewHistogram
+func (m *Metrics) NewHistogram(name string) metrics.Histogram {
+	return m.provider.NewHistogram(name, 50)
 }
 
-func (m *Metrics) Incr(value float64) *Metrics {
-	m.gauge.Add(value)
-	return m
-}
-
-func (m *Metrics) Decr(value float64) *Metrics {
-	m.gauge.Add(-value)
-	return m
-}
-
-// Observe
-func (m *Metrics) Observe(value float64) *Metrics {
-	m.histogram.Observe(value)
-	return m
-}
-
-// Counter
-func (m *Metrics) Counter() kitmetrics.Counter {
-	return m.counter
-}
-
-// Gauge
-func (m *Metrics) Gauge() kitmetrics.Gauge {
-	return m.gauge
-}
-
-// Histogram
-func (m *Metrics) Histogram() kitmetrics.Histogram {
-	return m.histogram
+// Stop
+func (m *Metrics) Stop() {
+	m.provider.Stop()
 }

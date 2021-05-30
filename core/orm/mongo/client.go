@@ -5,14 +5,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"sync"
 	"time"
 )
 
 type Client struct {
 	cfg Config
 	orm *mongo.Client
-	one sync.Once
 }
 
 func NewClient(cfg Config) (*Client, error) {

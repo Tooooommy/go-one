@@ -3,7 +3,6 @@ package jaegerx
 import (
 	"context"
 	"fmt"
-	"github.com/Tooooommy/go-one/core/trace"
 	"github.com/opentracing/opentracing-go"
 	"net/http"
 	"testing"
@@ -12,13 +11,7 @@ import (
 
 func TestNewJaegerTracer(t *testing.T) {
 	carrier := opentracing.HTTPHeadersCarrier(http.Header{})
-	closer, err := InitJaegerTracer(trace.Config{
-		Name:             "go-one",
-		SamplerType:      "const",
-		SamplerParam:     1,
-		ReporterHostPort: "127.0.0.1:6831",
-		ReporterLogSpans: true,
-	})
+	closer, err := InitJaegerTracer(nil, nil)
 	if err != nil {
 		panic(err)
 	}
