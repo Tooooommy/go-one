@@ -11,7 +11,17 @@ import (
 
 func TestNewJaegerTracer(t *testing.T) {
 	carrier := opentracing.HTTPHeadersCarrier(http.Header{})
-	closer, err := InitJaegerTracer(nil, nil)
+	closer, err := InitJaegerTracer(&Config{
+		Name: "go-one",
+		Sampler: Sampler{
+			Type:  "const",
+			Param: 1,
+		},
+		Reporter: Reporter{
+			Address:  "127.0.0.1:6831",
+			LogSpans: true,
+		},
+	}, nil)
 	if err != nil {
 		panic(err)
 	}

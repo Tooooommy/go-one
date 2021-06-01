@@ -11,7 +11,7 @@ func InitJaegerTracer(cfg *Config, metrics *metrics.Metrics) (io.Closer, error) 
 	c := cfg.JaegerConfig()
 	var options []jaegercfg.Option
 	options = append(options, jaegercfg.Logger(&logger{}))
-	if metrics == nil {
+	if metrics != nil {
 		options = append(options, jaegercfg.Metrics(NewFactory(c.ServiceName, metrics)))
 	}
 	return c.InitGlobalTracer(c.ServiceName, options...)

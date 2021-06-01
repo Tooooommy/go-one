@@ -7,8 +7,6 @@ import (
 
 type Config struct {
 	Name       string   `json:"name"`
-	User       string   `json:"user"`
-	Password   string   `json:"password"`
 	Disabled   bool     `json:"disabled"`
 	RPCMetrics bool     `json:"rpc_metrics"`
 	Gen128Bit  bool     `json:"gen_128_bit"`
@@ -29,6 +27,8 @@ type Reporter struct {
 	FlushInterval int    `json:"flush_interval"`
 	LogSpans      bool   `json:"log_spans"`
 	Address       string `json:"address"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
 	ReconDisabled bool   `json:"recon_disabled"`
 	ReconInterval int    `json:"recon_interval"`
 	Endpoint      string `json:"endpoint"`
@@ -55,8 +55,8 @@ func (cfg *Config) JaegerConfig() *jaegercfg.Configuration {
 			DisableAttemptReconnecting: cfg.Reporter.ReconDisabled,
 			AttemptReconnectInterval:   time.Duration(cfg.Reporter.ReconInterval),
 			CollectorEndpoint:          cfg.Reporter.Endpoint,
-			User:                       cfg.User,
-			Password:                   cfg.Password,
+			User:                       cfg.Reporter.Username,
+			Password:                   cfg.Reporter.Password,
 		},
 	}
 	return c

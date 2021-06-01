@@ -3,8 +3,9 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	"io"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type (
@@ -33,8 +34,15 @@ func NewClient(ctx context.Context, options ...Option) (*Client, error) {
 	switch cfg.Type {
 	case NodeType:
 		cli = redis.NewClient(cfg.RedisOptions())
+		cli.AddHook(&TracingHook{})
 	case ClusterType:
-		cli = redis.NewClusterClient(cfg.ClusterOptions())
+		opt := cfg.ClusterOptions()
+		opt.NewClient = func(opt *redis.Options) *redis.Client {
+			node := redis.NewClient(opt)
+			node.AddHook(&TracingHook{})
+			return node
+		}
+		cli = redis.NewClusterClient(opt)
 	default:
 		return nil, fmt.Errorf("redis type '%s' is not supported", cfg.Type)
 	}

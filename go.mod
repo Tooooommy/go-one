@@ -4,9 +4,7 @@ go 1.16
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
-	github.com/Shopify/sarama v1.29.0 // indirect
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
-	github.com/apache/pulsar-client-go v0.5.0 // indirect
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -17,6 +15,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-kit/kit v0.10.0
 	github.com/go-playground/validator/v10 v10.4.2
+	github.com/go-redis/redis/extra/redisotel/v8 v8.9.0
 	github.com/go-redis/redis/v8 v8.8.3
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -28,6 +27,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/klauspost/compress v1.12.2 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/meilisearch/meilisearch-go v0.14.1
 	github.com/milvus-io/milvus-sdk-go v1.1.0
@@ -35,19 +35,19 @@ require (
 	github.com/nats-io/nats-server/v2 v2.1.9 // indirect
 	github.com/nats-io/nats.go v1.11.0
 	github.com/opentracing/opentracing-go v1.2.0
-	github.com/panjf2000/ants/v2 v2.4.5 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.10.0
+	github.com/prometheus/client_golang v1.10.0 // indirect
 	github.com/prometheus/common v0.23.0 // indirect
-	github.com/silenceper/pool v1.0.0 // indirect
+	github.com/silenceper/pool v1.0.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect
 	github.com/sony/gobreaker v0.4.1
 	github.com/spf13/cobra v1.1.3
 	github.com/streadway/handy v0.0.0-20190108123426-d5acb3125c2a
+	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802 // indirect
 	github.com/uber/jaeger-client-go v2.28.0+incompatible
-	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	github.com/uber/jaeger-lib v2.4.1+incompatible
 	github.com/ugorji/go v1.2.5 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
 	go.etcd.io/etcd v0.0.0-20200402134248-51bdeb39e698 // indirect
@@ -60,10 +60,7 @@ require (
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	google.golang.org/genproto v0.0.0-20210518161634-ec7691c0a37d // indirect
 	google.golang.org/grpc v1.37.0
-	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
-	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
-	gopkg.in/jcmturner/gokrb5.v7 v7.2.3 // indirect
-	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/gorm v1.21.9
