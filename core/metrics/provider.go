@@ -10,18 +10,22 @@ import (
 type (
 	// Metrics
 	Metrics struct {
-		provider kitprovider.Provider
+		provider  kitprovider.Provider
+		namespace string
+		subsystem string
 	}
 )
 
 // NewMetrics
-func NewMetrics(namespace, subsystem string) *Metrics {
+func NewMetrics(namespace, subsystem string) kitprovider.Provider {
 	provider := kitprovider.NewExpvarProvider()
 	if len(namespace) != 0 && len(subsystem) != 0 {
 		provider = kitprovider.NewPrometheusProvider(namespace, subsystem)
 	}
 	return &Metrics{
-		provider: provider,
+		provider:  provider,
+		namespace: namespace,
+		subsystem: subsystem,
 	}
 }
 
@@ -36,8 +40,8 @@ func (m *Metrics) NewGauge(name string) metrics.Gauge {
 }
 
 // NewHistogram
-func (m *Metrics) NewHistogram(name string) metrics.Histogram {
-	return m.provider.NewHistogram(name, 50)
+func (m *Metrics) NewHistogram(name string, buckets int) metrics.Histogram {
+	return m.provider.NewHistogram(name, buckets)
 }
 
 // Stop

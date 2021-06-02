@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/gin-gonic/gin"
-	kitopentracing "github.com/go-kit/kit/tracing/opentracing"
+	kittracing "github.com/go-kit/kit/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 )
 
@@ -17,7 +17,7 @@ func TraceHandler(name string) gin.HandlerFunc {
 			defer span.Finish()
 		}
 		ctx = opentracing.ContextWithSpan(ctx, span)
-		request := kitopentracing.ContextToHTTP(opentracing.GlobalTracer(), zapx.KitL())
+		request := kittracing.ContextToHTTP(opentracing.GlobalTracer(), zapx.KitL())
 		c.Request = c.Request.WithContext(request(ctx, c.Request))
 		c.Next()
 	}

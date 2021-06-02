@@ -2,6 +2,7 @@ package rpcx
 
 import (
 	"fmt"
+	"github.com/Tooooommy/go-one/core/discov"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"net"
@@ -10,16 +11,16 @@ import (
 type (
 	// Server
 	Server struct {
-		cfg     Config
-		options []grpc.ServerOption
+		cfg     *ServerConf
 		service []ServiceFactory
+		options []grpc.ServerOption
 	}
 
 	ServiceFactory func(*grpc.Server)
 )
 
 // NewServer
-func NewServer(cfg Config, options ...grpc.ServerOption) *Server {
+func NewServer(cfg *ServerConf, options ...grpc.ServerOption) *Server {
 	svr := &Server{
 		cfg:     cfg,
 		options: options,
@@ -27,8 +28,8 @@ func NewServer(cfg Config, options ...grpc.ServerOption) *Server {
 	return svr
 }
 
-// Config
-func (s *Server) Config() Config {
+// ServerConf
+func (s *Server) Config() *ServerConf {
 	return s.cfg
 }
 
@@ -54,6 +55,12 @@ func (s *Server) Start() error {
 	if err != nil {
 		return err
 	}
+	cli := discov.NewRegistry(&s.cfg.Etcd)
+	err = cli.Register()
+	if err != nil {
+		return err
+	}
+	defer cli.Deregister()
 
 	if s.cfg.HaveCert() { // 验证
 		tls, err := credentials.NewServerTLSFromFile(s.cfg.CertFile, s.cfg.KeyFile)

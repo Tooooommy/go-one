@@ -27,7 +27,7 @@ func (f *factory) Gauge(name string) kmetrics.Gauge {
 }
 
 func (f *factory) Histogram(name string) kmetrics.Histogram {
-	return f.metrics.NewHistogram(name)
+	return f.metrics.NewHistogram(name, 50)
 }
 
 func (f *factory) Capabilities() xkit.Capabilities {

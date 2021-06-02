@@ -5,11 +5,13 @@ import (
 	"sync"
 )
 
+// Manager
 type Manager struct {
 	m sync.Map
 }
 
-func NewManger() *Manager {
+// NewManager
+func NewManager() *Manager {
 	return &Manager{}
 }
 

@@ -1,6 +1,7 @@
 package jaegerx
 
 import (
+	"fmt"
 	"github.com/Tooooommy/go-one/core/zapx"
 )
 
@@ -11,5 +12,6 @@ func (*logger) Error(msg string) {
 }
 
 func (*logger) Infof(msg string, args ...interface{}) {
-	zapx.Info().Any("args", args).Msg(msg)
+	msg = fmt.Sprintf(msg, args)
+	zapx.Info().Msg(msg)
 }
