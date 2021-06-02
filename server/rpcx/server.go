@@ -55,20 +55,23 @@ func (s *Server) Start() error {
 	if err != nil {
 		return err
 	}
-	cli := discov.NewRegistry(&s.cfg.Etcd)
-	err = cli.Register()
-	if err != nil {
-		return err
-	}
-	defer cli.Deregister()
 
-	if s.cfg.HaveCert() { // 验证
+	// TLS
+	if s.cfg.HaveCert() {
 		tls, err := credentials.NewServerTLSFromFile(s.cfg.CertFile, s.cfg.KeyFile)
 		if err != nil {
 			return err
 		}
 		s.options = append(s.options, grpc.Creds(tls))
 	}
+
+	// 注册服务
+	cli := discov.NewRegistry(&s.cfg.Etcd)
+	err = cli.Register()
+	if err != nil {
+		return err
+	}
+	defer cli.Deregister()
 
 	server := grpc.NewServer(s.options...)
 	defer server.GracefulStop()
