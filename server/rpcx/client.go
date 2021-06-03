@@ -37,12 +37,14 @@ func SetClientTimeout(timeout int64) ClientOption {
 	}
 }
 
+// SetClientToken
 func SetClientToken(token string) ClientOption {
 	return func(c *ClientConf) {
 		c.Token = token
 	}
 }
 
+// Invoke
 func (c *Client) Invoke(ctx context.Context, request interface{}, invoker discov.Invoker) (interface{}, error) {
 	instancer, err := discov.NewClient(&c.cfg.Etcd).NewInstancer(c.cfg.Address)
 	if err != nil {

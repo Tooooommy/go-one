@@ -71,10 +71,12 @@ func (s *Server) Start() error {
 	if err != nil {
 		return err
 	}
-	defer cli.Deregister()
 
 	server := grpc.NewServer(s.options...)
-	defer server.GracefulStop()
+	defer func() {
+		cli.Deregister()
+		server.GracefulStop()
+	}()
 
 	return server.Serve(lis)
 }
