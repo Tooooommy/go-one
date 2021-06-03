@@ -67,7 +67,7 @@ func SetDecode(decode grpctranspot.DecodeResponseFunc) InvokerOption {
 	}
 }
 
-// SetOption
+// SetOptions
 func SetOptions(options ...grpctranspot.ClientOption) InvokerOption {
 	return func(i *invoker) {
 		i.options = append(i.options, options...)
@@ -75,32 +75,17 @@ func SetOptions(options ...grpctranspot.ClientOption) InvokerOption {
 }
 
 // Invoke
-func (i *invoker) Invoke(
-	ctx context.Context,
-	instancer sd.Instancer,
-	retries int,
-	timeout time.Duration,
-	request interface{},
-) (interface{}, error) {
+func (i *invoker) Invoke(ctx context.Context, instancer sd.Instancer, retries int,
+	timeout time.Duration, request interface{}) (interface{}, error) {
 	factory := func(instance string) (endpoint.Endpoint, io.Closer, error) {
-		conn, err := grpc.DialContext(
-			ctx,
-			instance,
-			grpc.WithInsecure(), // TODO: 暂未添加
-		)
+		// TODO: 暂未添加
+		conn, err := grpc.DialContext(ctx, instance, grpc.WithInsecure())
 		if err != nil {
 			return nil, nil, err
 		}
 		i.options = append(i.options, grpctranspot.ClientBefore(kitjwt.ContextToGRPC()))
-		client := grpctranspot.NewClient(
-			conn,
-			i.service,
-			i.method,
-			i.encode,
-			i.decode,
-			request,
-			i.options...,
-		)
+		client := grpctranspot.NewClient(conn, i.service, i.method, i.encode, i.decode,
+			request, i.options...)
 		return client.Endpoint(), conn, nil
 	}
 
