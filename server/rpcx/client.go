@@ -45,7 +45,7 @@ func SetClientToken(token string) ClientOption {
 }
 
 // Invoke
-func (c *Client) Invoke(ctx context.Context, request interface{}, invoker discov.Invoker) (interface{}, error) {
+func (c *Client) Invoke(ctx context.Context, invoker discov.Invoker, request interface{}) (interface{}, error) {
 	instancer, err := discov.NewClient(&c.cfg.Etcd).NewInstancer(c.cfg.Address)
 	if err != nil {
 		return nil, err
