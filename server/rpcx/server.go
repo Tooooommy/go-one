@@ -56,7 +56,14 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	// TLS
+	// Etcd服务发现
+	cli := discov.NewRegistry(&s.cfg.Etcd)
+	err = cli.Register()
+	if err != nil {
+		return err
+	}
+
+	// TLS拦截器
 	if s.cfg.HaveCert() {
 		tls, err := credentials.NewServerTLSFromFile(s.cfg.CertFile, s.cfg.KeyFile)
 		if err != nil {
@@ -65,18 +72,17 @@ func (s *Server) Start() error {
 		s.options = append(s.options, grpc.Creds(tls))
 	}
 
-	// 注册服务
-	cli := discov.NewRegistry(&s.cfg.Etcd)
-	err = cli.Register()
-	if err != nil {
-		return err
-	}
-
+	//
 	server := grpc.NewServer(s.options...)
 	defer func() {
 		cli.Deregister()
 		server.GracefulStop()
 	}()
+
+	// 注册服务
+	for _, service := range s.service {
+		service(server)
+	}
 
 	return server.Serve(lis)
 }

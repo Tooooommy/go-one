@@ -22,7 +22,7 @@ func NewClient(cfg *Config) *Client {
 }
 
 func (c *Client) getClient() (etcdv3.Client, error) {
-	val, ok := manager.Get(c.cfg.Key)
+	val, ok := manager.Get(c.cfg.Name)
 	if !ok {
 		cli, err := etcdv3.NewClient(
 			context.Background(),
@@ -32,7 +32,7 @@ func (c *Client) getClient() (etcdv3.Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		manager.Set(c.cfg.Key, cli)
+		manager.Set(c.cfg.Name, cli)
 		return cli, nil
 	}
 	return val.(etcdv3.Client), nil

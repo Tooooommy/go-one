@@ -24,22 +24,22 @@ func NewClient(cfg *ClientConf, options ...ClientOption) *Client {
 	return client
 }
 
-// SetClientRetries
-func SetClientRetries(retries int) ClientOption {
+// ClientRetries
+func ClientRetries(retries int) ClientOption {
 	return func(c *ClientConf) {
 		c.Retries = retries
 	}
 }
 
-// SetClientTimeout
-func SetClientTimeout(timeout int64) ClientOption {
+// ClientTimeout
+func ClientTimeout(timeout int64) ClientOption {
 	return func(c *ClientConf) {
 		c.Timeout = timeout
 	}
 }
 
-// SetClientToken
-func SetClientToken(token string) ClientOption {
+// ClientToken
+func ClientToken(token string) ClientOption {
 	return func(c *ClientConf) {
 		c.Token = token
 	}

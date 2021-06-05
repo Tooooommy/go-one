@@ -4,6 +4,7 @@ import (
 	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/etcdv3"
+	"strconv"
 	"time"
 )
 
@@ -32,9 +33,10 @@ func (c *Client) Register() error {
 	}
 	heartbeat := time.Duration(c.cfg.Heartbeat) * time.Second
 	ttl := time.Duration(c.cfg.Ttl) * time.Second
-	for _, host := range c.cfg.Hosts {
+	for index, host := range c.cfg.Hosts {
+		key := c.cfg.Name + "-" + strconv.Itoa(index)
 		err := cli.Register(etcdv3.Service{
-			Key:   c.cfg.Name + "/" + host,
+			Key:   key,
 			Value: host,
 			TTL:   etcdv3.NewTTLOption(heartbeat, ttl),
 		})
@@ -54,10 +56,9 @@ func (c *Client) Deregister() error {
 	if err != nil {
 		return err
 	}
-	for _, host := range c.cfg.Hosts {
-		err = cli.Deregister(etcdv3.Service{
-			Key: c.cfg.Name + "/" + host,
-		})
+	for index := range c.cfg.Hosts {
+		key := c.cfg.Name + "-" + strconv.Itoa(index)
+		err = cli.Deregister(etcdv3.Service{Key: key})
 		if err != nil {
 			return err
 		}

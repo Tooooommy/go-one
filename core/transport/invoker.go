@@ -146,8 +146,7 @@ func (i *invoker) MakeEndpoint(conn *grpc.ClientConn) endpoint.Endpoint {
 }
 
 // Invoke
-func (i *invoker) Invoke(ctx context.Context, instancer sd.Instancer, retries int,
-	timeout time.Duration, request interface{}) (interface{}, error) {
+func (i *invoker) Invoke(ctx context.Context, instancer sd.Instancer, retries int, timeout time.Duration, request interface{}) (interface{}, error) {
 	endpointer := sd.NewEndpointer(instancer, i.factory(ctx), zapx.KitL())
 	e := lb.Retry(retries, timeout, lb.NewRoundRobin(endpointer))
 	return e(ctx, request)

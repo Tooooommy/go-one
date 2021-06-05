@@ -13,8 +13,7 @@ type (
 		Serve(context.Context, interface{}) (interface{}, error)
 	}
 
-	HandleErrFunc = func(context.Context, error)
-	service       struct {
+	service struct {
 		e          endpoint.Endpoint
 		middleware []endpoint.Middleware
 		decode     grpctranspot.DecodeRequestFunc
@@ -25,6 +24,7 @@ type (
 		HandleErr  HandleErrFunc
 	}
 
+	HandleErrFunc = func(context.Context, error)
 	ServiceOption func(r *service)
 )
 
