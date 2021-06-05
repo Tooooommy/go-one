@@ -115,7 +115,7 @@ func TestPull(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			log.Println("order-review service")
+			log.Println("order-review transport")
 			log.Printf("OrderID:%d, CustomerID: %s, Status:%s\n", order.OrderID, order.CustomerID, order.Status)
 			reviewOrder(js, order)
 		}
@@ -150,7 +150,7 @@ func TestSubscribe(t *testing.T) {
 			log.Fatal(err)
 		}
 
-		log.Printf("monitor service subscribes from subject:%s\n", msg.Subject)
+		log.Printf("monitor transport subscribes from subject:%s\n", msg.Subject)
 		log.Printf("OrderID:%d, CustomerID: %s, Status:%s\n", order.OrderID, order.CustomerID, order.Status)
 	}, nats.Durable("monitor"), nats.ManualAck())
 

@@ -16,7 +16,7 @@ type (
 		options []grpc.ServerOption
 	}
 
-	ServiceFactory func(*grpc.Server)
+	ServiceFactory func(*ServerConf, *grpc.Server)
 )
 
 // NewServer
@@ -81,7 +81,7 @@ func (s *Server) Start() error {
 
 	// 注册服务
 	for _, service := range s.service {
-		service(server)
+		service(s.cfg, server)
 	}
 
 	return server.Serve(lis)

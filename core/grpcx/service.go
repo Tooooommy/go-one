@@ -1,4 +1,4 @@
-package transport
+package grpcx
 
 import (
 	"context"
@@ -14,14 +14,13 @@ type (
 	}
 
 	service struct {
-		e          endpoint.Endpoint
-		middleware []endpoint.Middleware
-		decode     grpctranspot.DecodeRequestFunc
-		encode     grpctranspot.EncodeResponseFunc
-		before     []grpctranspot.ServerRequestFunc
-		after      []grpctranspot.ServerResponseFunc
-		finalizer  []grpctranspot.ServerFinalizerFunc
-		HandleErr  HandleErrFunc
+		e         endpoint.Endpoint
+		decode    grpctranspot.DecodeRequestFunc
+		encode    grpctranspot.EncodeResponseFunc
+		before    []grpctranspot.ServerRequestFunc
+		after     []grpctranspot.ServerResponseFunc
+		finalizer []grpctranspot.ServerFinalizerFunc
+		handleErr HandleErrFunc
 	}
 
 	HandleErrFunc = func(context.Context, error)
@@ -35,9 +34,6 @@ func NewService(e endpoint.Endpoint, options ...ServiceOption) Service {
 	}
 	for _, opt := range options {
 		opt(s)
-	}
-	for _, mid := range s.middleware {
-		s.e = mid(s.e)
 	}
 	return s
 }
@@ -53,13 +49,6 @@ func ServiceBefore(before ...grpctranspot.ServerRequestFunc) ServiceOption {
 func ServiceAfter(after ...grpctranspot.ServerResponseFunc) ServiceOption {
 	return func(r *service) {
 		r.after = append(r.after, after...)
-	}
-}
-
-// ServiceMiddleware
-func ServiceMiddleware(middleware ...endpoint.Middleware) ServiceOption {
-	return func(r *service) {
-		r.middleware = append(r.middleware, middleware...)
 	}
 }
 
@@ -79,7 +68,7 @@ func ServiceEncode(enc grpctranspot.EncodeResponseFunc) ServiceOption {
 
 func ServiceHandleErr(errHandler HandleErrFunc) ServiceOption {
 	return func(r *service) {
-		r.HandleErr = errHandler
+		r.handleErr = errHandler
 	}
 }
 
@@ -105,14 +94,14 @@ func (s *service) Serve(ctx context.Context, request interface{}) (response inte
 	if s.decode != nil {
 		request, err = s.decode(ctx, request)
 		if err != nil {
-			s.HandleErr(ctx, err)
+			s.handleErr(ctx, err)
 			return nil, err
 		}
 	}
 
 	response, err = s.e(ctx, request)
 	if err != nil {
-		s.HandleErr(ctx, err)
+		s.handleErr(ctx, err)
 		return nil, err
 	}
 
@@ -124,21 +113,21 @@ func (s *service) Serve(ctx context.Context, request interface{}) (response inte
 	if s.encode != nil {
 		response, err = s.encode(ctx, response)
 		if err != nil {
-			s.HandleErr(ctx, err)
+			s.handleErr(ctx, err)
 			return nil, err
 		}
 	}
 
 	if len(mdHeader) > 0 {
 		if err = grpc.SendHeader(ctx, mdHeader); err != nil {
-			s.HandleErr(ctx, err)
+			s.handleErr(ctx, err)
 			return nil, err
 		}
 	}
 
 	if len(mdTrailer) > 0 {
 		if err = grpc.SetTrailer(ctx, mdTrailer); err != nil {
-			s.HandleErr(ctx, err)
+			s.handleErr(ctx, err)
 			return nil, err
 		}
 	}

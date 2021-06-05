@@ -3,7 +3,7 @@ package rpcx
 import (
 	"context"
 	"github.com/Tooooommy/go-one/core/discov"
-	"github.com/Tooooommy/go-one/core/transport"
+	"github.com/Tooooommy/go-one/core/grpcx"
 	"time"
 )
 
@@ -46,7 +46,7 @@ func ClientToken(token string) ClientOption {
 }
 
 // Invoke
-func (c *Client) Invoke(ctx context.Context, invoker transport.Invoker, request interface{}) (interface{}, error) {
+func (c *Client) Invoke(ctx context.Context, invoker grpcx.Invoker, request interface{}) (interface{}, error) {
 	instancer, err := discov.NewClient(&c.cfg.Etcd).NewInstancer(c.cfg.Address)
 	if err != nil {
 		return nil, err

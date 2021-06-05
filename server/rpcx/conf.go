@@ -7,7 +7,7 @@ import (
 
 type (
 	ServerConf struct {
-		server.Config
+		server.Conf
 		Etcd discov.Config `json:"etcd"`
 	}
 

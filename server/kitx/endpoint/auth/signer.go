@@ -29,17 +29,16 @@ func KitSigner(secret []byte, claims jwt.MapClaims) endpoint.Middleware {
 	return kitjwt.NewSigner(kid, secret, jwt.SigningMethodHS256, claims)
 }
 
-func Signer(secret []byte, timeout int) endpoint.Middleware {
+func Signer(secret []byte, timeout time.Duration) endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
 		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 			response, err = next(ctx, request) // 先执行
 			if err != nil {
 				return nil, err
 			}
-
-			claims, ok := ctx.Value(response).(jwt.MapClaims)
+			claims, ok := ctx.Value(kitjwt.JWTClaimsContextKey).(jwt.MapClaims)
 			if !ok {
-				return nil, ErrInvalidClaims
+				return response, nil
 			}
 
 			// 生成
@@ -47,7 +46,7 @@ func Signer(secret []byte, timeout int) endpoint.Middleware {
 			buildClaims(claims, JWTSubject, "go-one")
 			buildClaims(claims, JWTAudience, "go-one")
 			buildClaims(claims, JWTIssueAt, time.Now().Unix())
-			buildClaims(claims, JWTExpire, time.Now().Add(time.Duration(timeout)*time.Hour).Unix())
+			buildClaims(claims, JWTExpire, time.Now().Add(timeout).Unix())
 			buildClaims(claims, JWTNotBefore, time.Now().Unix())
 			buildClaims(claims, JWTId, uuid.Must(uuid.NewUUID()).String())
 			signer := KitSigner(secret, claims)

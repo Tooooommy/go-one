@@ -1,7 +1,6 @@
 package ginx
 
 import (
-	"fmt"
 	"github.com/Tooooommy/go-one/server"
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +8,7 @@ import (
 // Server
 type Server struct {
 	eng *gin.Engine
-	cfg Config
+	cfg *Conf
 }
 
 // ServerOption
@@ -17,13 +16,9 @@ type ServerOption func(s *Server)
 
 // NewServer: 实例化Server
 func NewServer(options ...ServerOption) *Server {
-	cfg := Config{
-		Config: server.DefaultConfig(),
-	}
-	eng := gin.Default()
 	s := &Server{
-		eng: eng,
-		cfg: cfg,
+		eng: gin.New(),
+		cfg: &Conf{Conf: server.DefaultConfig()},
 	}
 	for _, opt := range options {
 		opt(s)
@@ -38,8 +33,8 @@ func WithEngine(eng *gin.Engine) ServerOption {
 	}
 }
 
-// WithConfig: 设置Config
-func WithConfig(cfg Config) ServerOption {
+// WithConf: 设置Config
+func WithConf(cfg *Conf) ServerOption {
 	return func(s *Server) {
 		s.cfg = cfg
 	}
@@ -50,17 +45,16 @@ func (s *Server) Engine() *gin.Engine {
 	return s.eng
 }
 
-// Config: 获取config.HttpConfig配置
-func (s *Server) Config() Config {
+// Conf: 获取config.HttpConfig配置
+func (s *Server) Conf() *Conf {
 	return s.cfg
 }
 
 // Start: 启动服务
 func (s *Server) Start() error {
-	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	if s.cfg.HaveCert() {
-		return s.eng.RunTLS(addr, s.cfg.CertFile, s.cfg.KeyFile)
+		return s.eng.RunTLS(s.cfg.Address(), s.cfg.CertFile, s.cfg.KeyFile)
 	} else {
-		return s.eng.Run(addr)
+		return s.eng.Run(s.cfg.Address())
 	}
 }

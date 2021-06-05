@@ -8,8 +8,8 @@ import (
 
 func main() {
 	router := gin.Default()
-	cfg := ginx.Config{
-		Config: server.Config{
+	cfg := ginx.Conf{
+		Conf: server.Conf{
 			Name: "go-one",
 			Host: "127.0.0.1",
 			Port: 8080,
@@ -23,7 +23,7 @@ func main() {
 
 	svr := ginx.NewServer(
 		ginx.WithConfig(cfg),
-		ginx.WithGinEngine(router),
+		ginx.WithEngine(router),
 	)
 	err := svr.Start()
 	if err != nil {

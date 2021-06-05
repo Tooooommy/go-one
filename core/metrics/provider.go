@@ -18,9 +18,11 @@ type (
 
 // NewMetrics
 func NewMetrics(namespace, subsystem string) kitprovider.Provider {
-	provider := kitprovider.NewExpvarProvider()
+	var provider kitprovider.Provider
 	if len(namespace) != 0 && len(subsystem) != 0 {
 		provider = kitprovider.NewPrometheusProvider(namespace, subsystem)
+	} else {
+		provider = kitprovider.NewExpvarProvider()
 	}
 	return &Metrics{
 		provider:  provider,

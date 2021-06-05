@@ -5,12 +5,11 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/ratelimit"
 	"golang.org/x/time/rate"
-	"time"
 )
 
-func DelayLimiter(interval, burst int) endpoint.Middleware {
-	if burst > 0 {
-		limiter := rate.NewLimiter(rate.Every(time.Second*time.Duration(interval)), burst)
+func DelayLimiter(limit float64) endpoint.Middleware {
+	if limit > 0 {
+		limiter := rate.NewLimiter(rate.Limit(limit), 1)
 		return ratelimit.NewDelayingLimiter(limiter)
 	} else {
 		return ep.NopMiddleware()

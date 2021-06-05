@@ -5,12 +5,11 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/ratelimit"
 	"golang.org/x/time/rate"
-	"time"
 )
 
-func ErrorLimiter(interval, burst int) endpoint.Middleware {
-	if burst > 0 {
-		limiter := rate.NewLimiter(rate.Every(time.Second*time.Duration(interval)), burst)
+func ErrorLimiter(limit float64) endpoint.Middleware {
+	if limit > 0 {
+		limiter := rate.NewLimiter(rate.Limit(limit), 1)
 		return ratelimit.NewErroringLimiter(limiter)
 	} else {
 		return ep.NopMiddleware()

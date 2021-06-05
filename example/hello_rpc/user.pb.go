@@ -129,7 +129,7 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// UserClient is the client API for User service.
+// UserClient is the client API for User transport.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserClient interface {
@@ -163,7 +163,7 @@ func (c *userClient) Pong(ctx context.Context, in *Request, opts ...grpc.CallOpt
 	return out, nil
 }
 
-// UserServer is the server API for User service.
+// UserServer is the server API for User transport.
 type UserServer interface {
 	Ping(context.Context, *Request) (*Response, error)
 	Pong(context.Context, *Request) (*Response, error)
