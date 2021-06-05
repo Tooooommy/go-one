@@ -30,7 +30,9 @@ type (
 
 // NewService
 func NewService(e endpoint.Endpoint, options ...ServiceOption) Service {
-	s := &service{e: e}
+	s := &service{
+		e: e,
+	}
 	for _, opt := range options {
 		opt(s)
 	}
@@ -100,10 +102,12 @@ func (s *service) Serve(ctx context.Context, request interface{}) (response inte
 		ctx = f(ctx, md)
 	}
 
-	request, err = s.decode(ctx, request)
-	if err != nil {
-		s.HandleErr(ctx, err)
-		return nil, err
+	if s.decode != nil {
+		request, err = s.decode(ctx, request)
+		if err != nil {
+			s.HandleErr(ctx, err)
+			return nil, err
+		}
 	}
 
 	response, err = s.e(ctx, request)
@@ -117,10 +121,12 @@ func (s *service) Serve(ctx context.Context, request interface{}) (response inte
 		ctx = f(ctx, &mdHeader, &mdTrailer)
 	}
 
-	response, err = s.encode(ctx, response)
-	if err != nil {
-		s.HandleErr(ctx, err)
-		return nil, err
+	if s.encode != nil {
+		response, err = s.encode(ctx, response)
+		if err != nil {
+			s.HandleErr(ctx, err)
+			return nil, err
+		}
 	}
 
 	if len(mdHeader) > 0 {

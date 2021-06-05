@@ -32,21 +32,10 @@ type (
 	InvokerOption func(*invoker)
 )
 
-var (
-	defaultEncode = func(ctx context.Context, request interface{}) (interface{}, error) {
-		return request, nil
-	}
-	defaultDecode = func(ctx context.Context, response interface{}) (interface{}, error) {
-		return response, nil
-	}
-)
-
 // NewInvoker
 func NewInvoker(invoke InvokeFunc, options ...InvokerOption) Invoker {
 	invoker := &invoker{
 		invoke: invoke,
-		encode: defaultDecode,
-		decode: defaultEncode,
 	}
 	for _, opt := range options {
 		opt(invoker)
@@ -122,9 +111,11 @@ func (i *invoker) MakeEndpoint(conn *grpc.ClientConn) endpoint.Endpoint {
 			}()
 		}
 
-		request, err = i.encode(ctx, request)
-		if err != nil {
-			return nil, err
+		if i.encode != nil {
+			request, err = i.encode(ctx, request)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		md := &metadata.MD{}
@@ -143,10 +134,13 @@ func (i *invoker) MakeEndpoint(conn *grpc.ClientConn) endpoint.Endpoint {
 			ctx = f(ctx, header, trailer)
 		}
 
-		response, err = i.decode(ctx, response)
-		if err != nil {
-			return nil, err
+		if i.decode != nil {
+			response, err = i.decode(ctx, response)
+			if err != nil {
+				return nil, err
+			}
 		}
+
 		return response, nil
 	}
 }
