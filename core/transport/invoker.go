@@ -1,11 +1,10 @@
-package discov
+package transport
 
 import (
 	"context"
 	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/sd"
-	"github.com/go-kit/kit/sd/etcdv3"
 	"github.com/go-kit/kit/sd/lb"
 	grpctranspot "github.com/go-kit/kit/transport/grpc"
 	"google.golang.org/grpc"
@@ -21,6 +20,7 @@ type (
 
 	invoker struct {
 		invoke    InvokeFunc
+		factory   func(context.Context) sd.Factory
 		encode    grpctranspot.EncodeRequestFunc
 		decode    grpctranspot.DecodeResponseFunc
 		before    []grpctranspot.ClientRequestFunc
@@ -42,14 +42,27 @@ var (
 )
 
 // NewInvoker
-func NewInvoker(options ...InvokerOption) Invoker {
+func NewInvoker(invoke InvokeFunc, options ...InvokerOption) Invoker {
 	invoker := &invoker{
+		invoke: invoke,
 		encode: defaultDecode,
 		decode: defaultEncode,
 	}
 	for _, opt := range options {
 		opt(invoker)
 	}
+
+	invoker.factory = func(ctx context.Context) sd.Factory {
+		return func(instance string) (endpoint.Endpoint, io.Closer, error) {
+			// TODO: 暂未添加
+			conn, err := grpc.DialContext(ctx, instance, grpc.WithInsecure())
+			if err != nil {
+				return nil, nil, err
+			}
+			return invoker.MakeEndpoint(conn), conn, nil
+		}
+	}
+
 	return invoker
 }
 
@@ -141,28 +154,7 @@ func (i *invoker) MakeEndpoint(conn *grpc.ClientConn) endpoint.Endpoint {
 // Invoke
 func (i *invoker) Invoke(ctx context.Context, instancer sd.Instancer, retries int,
 	timeout time.Duration, request interface{}) (interface{}, error) {
-	factory := func(instance string) (endpoint.Endpoint, io.Closer, error) {
-		// TODO: 暂未添加
-		conn, err := grpc.DialContext(ctx, instance, grpc.WithInsecure())
-		if err != nil {
-			return nil, nil, err
-		}
-		return i.MakeEndpoint(conn), conn, nil
-	}
-
-	endpointer := sd.NewEndpointer(instancer, factory, zapx.KitL())
+	endpointer := sd.NewEndpointer(instancer, i.factory(ctx), zapx.KitL())
 	e := lb.Retry(retries, timeout, lb.NewRoundRobin(endpointer))
 	return e(ctx, request)
-}
-
-func (c *Client) NewInstancer(prefix string) (sd.Instancer, error) {
-	if c.cfg.HaveEtcd() {
-		cli, err := c.getClient()
-		if err != nil {
-			return nil, err
-		}
-		return etcdv3.NewInstancer(cli, prefix, zapx.KitL())
-	} else {
-		return sd.FixedInstancer([]string{prefix}), nil
-	}
 }

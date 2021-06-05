@@ -6,8 +6,8 @@ import (
 )
 
 type Config struct {
+	Name          string   `json:"name"`      // key
 	Hosts         []string `json:"endpoints"` // val
-	Key           string   `json:"prefix"`    // key
 	Username      string   `json:"username"`
 	Password      string   `json:"password"`
 	CertFile      string   `json:"cert_file"`
@@ -30,5 +30,5 @@ func (c *Config) ClientOptions() etcdv3.ClientOptions {
 }
 
 func (c Config) HaveEtcd() bool {
-	return len(c.Hosts) > 0 && len(c.Key) > 0
+	return len(c.Hosts) > 0 && len(c.Name) > 0
 }
