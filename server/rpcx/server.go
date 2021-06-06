@@ -11,7 +11,7 @@ type (
 	// Server
 	Server interface {
 		Register(ServiceFactory)
-		Start(options ...grpc.ServerOption) error
+		Serve(options ...grpc.ServerOption) error
 	}
 
 	// server
@@ -33,8 +33,8 @@ func (s *server) Register(factory ServiceFactory) {
 	s.factory = factory
 }
 
-// Start
-func (s *server) Start(options ...grpc.ServerOption) error {
+// Serve
+func (s *server) Serve(options ...grpc.ServerOption) error {
 	lis, err := net.Listen("tcp", s.cfg.Address())
 	if err != nil {
 		return err

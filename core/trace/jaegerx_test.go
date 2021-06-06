@@ -2,8 +2,10 @@ package trace
 
 import (
 	"context"
+	"fmt"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
+	"github.com/uber/jaeger-client-go"
 	"net"
 	"net/http"
 	"strconv"
@@ -12,9 +14,9 @@ import (
 )
 
 func TestNewJaegerTracer(t *testing.T) {
-	carrier := opentracing.HTTPHeadersCarrier(http.Header{})
+	carrier := http.Header{}
 
-	closer, err := InitJaegerTracer(&Config{
+	closer, err := InitTracer(&Config{
 		Name: "go-one",
 		Sampler: Sampler{
 			Type:  "const",
@@ -44,15 +46,7 @@ func TestNewJaegerTracer(t *testing.T) {
 		ext.PeerHostname.Set(span1, "localhost")
 	}
 
-	// There's nothing we can do with any errors here.
-	if err = tracer.Inject(
-		span1.Context(),
-		opentracing.HTTPHeaders,
-		carrier,
-	); err != nil {
-		panic(err)
-	}
-	span1.SetBaggageItem("span1", "span1")
+	span1.SetBaggageItem("span7", "span1")
 	time.Sleep(10 * time.Millisecond)
 
 	ctx := opentracing.ContextWithSpan(context.Background(), span1)
@@ -71,4 +65,16 @@ func TestNewJaegerTracer(t *testing.T) {
 	span5 := opentracing.StartSpan("span5", opentracing.ChildOf(span3.Context()))
 	defer span5.Finish()
 
+	s5 := span5.Context()
+	c, ok := s5.(jaeger.SpanContext)
+	if ok {
+		fmt.Println("span_ctx", c.TraceID().String()+":"+c.SpanID().String()+":"+c.ParentID().String()+":"+string(c.Flags()))
+	}
+	err = tracer.Inject(span5.Context(), opentracing.HTTPHeaders, carrier)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(carrier)
+
+	fmt.Println(carrier)
 }

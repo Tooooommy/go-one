@@ -12,6 +12,8 @@ func (*logger) Error(msg string) {
 }
 
 func (*logger) Infof(msg string, args ...interface{}) {
-	msg = fmt.Sprintf(msg, args)
+	if len(args) > 0 {
+		msg = fmt.Sprintf(msg, args)
+	}
 	zapx.Info().Msg(msg)
 }

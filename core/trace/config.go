@@ -6,12 +6,10 @@ import (
 )
 
 type Config struct {
-	Name       string   `json:"name"`
-	Disabled   bool     `json:"disabled"`
-	RPCMetrics bool     `json:"rpc_metrics"`
-	Gen128Bit  bool     `json:"gen_128_bit"`
-	Sampler    Sampler  `json:"sampler"`
-	Reporter   Reporter `json:"reporter"`
+	Name     string   `json:"name"`
+	Disabled bool     `json:"disabled"`
+	Sampler  Sampler  `json:"sampler"`
+	Reporter Reporter `json:"reporter"`
 }
 
 type Sampler struct {
@@ -38,8 +36,8 @@ func (cfg *Config) JaegerConfig() *jaegercfg.Configuration {
 	c := &jaegercfg.Configuration{
 		ServiceName: cfg.Name,
 		Disabled:    cfg.Disabled,
-		RPCMetrics:  cfg.RPCMetrics,
-		Gen128Bit:   cfg.Gen128Bit,
+		RPCMetrics:  true,
+		Gen128Bit:   true,
 		Sampler: &jaegercfg.SamplerConfig{
 			Type:                    cfg.Sampler.Type,
 			Param:                   cfg.Sampler.Param,

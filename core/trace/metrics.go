@@ -8,9 +8,7 @@ import (
 )
 
 func NewFactory(namespace string, metrics *metrics.Metrics) xmetrics.Factory {
-	return xkit.Wrap(namespace, &factory{
-		metrics: metrics,
-	})
+	return xkit.Wrap(namespace, &factory{metrics: metrics})
 }
 
 type factory struct {
