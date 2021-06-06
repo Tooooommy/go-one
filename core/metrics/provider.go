@@ -10,9 +10,9 @@ import (
 type (
 	// Metrics
 	Metrics struct {
-		provider  kitprovider.Provider
 		namespace string
 		subsystem string
+		provider  kitprovider.Provider
 	}
 )
 

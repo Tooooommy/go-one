@@ -1,4 +1,4 @@
-package jaegerx
+package trace
 
 import (
 	"github.com/Tooooommy/go-one/core/metrics"

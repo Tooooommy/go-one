@@ -2,12 +2,12 @@ package rpcx
 
 import (
 	"github.com/Tooooommy/go-one/core/discov"
-	"github.com/Tooooommy/go-one/server"
+	"github.com/Tooooommy/go-one/server/conf"
 )
 
 type (
 	ServerConf struct {
-		server.Conf
+		conf.Conf
 		Etcd discov.Config `json:"etcd"`
 	}
 

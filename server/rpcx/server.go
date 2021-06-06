@@ -1,7 +1,6 @@
 package rpcx
 
 import (
-	"fmt"
 	"github.com/Tooooommy/go-one/core/discov"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -10,48 +9,33 @@ import (
 
 type (
 	// Server
-	Server struct {
-		cfg     *ServerConf
-		service []ServiceFactory
-		options []grpc.ServerOption
+	Server interface {
+		Register(ServiceFactory)
+		Start(options ...grpc.ServerOption) error
 	}
 
-	ServiceFactory func(*ServerConf, *grpc.Server)
+	// server
+	server struct {
+		cfg     *ServerConf
+		factory ServiceFactory
+	}
+
+	ServiceFactory func(*grpc.Server)
 )
 
 // NewServer
-func NewServer(cfg *ServerConf, options ...grpc.ServerOption) *Server {
-	svr := &Server{
-		cfg:     cfg,
-		options: options,
-	}
-	return svr
-}
-
-// ServerConf
-func (s *Server) Config() *ServerConf {
-	return s.cfg
-}
-
-// StreamInterceptor
-func (s *Server) StreamInterceptor(interceptors ...grpc.StreamServerInterceptor) {
-	s.options = append(s.options, grpc.ChainStreamInterceptor(interceptors...))
-}
-
-// UnaryInterceptor
-func (s *Server) UnaryInterceptor(interceptor ...grpc.UnaryServerInterceptor) {
-	s.options = append(s.options, grpc.ChainUnaryInterceptor(interceptor...))
+func NewServer(cfg *ServerConf) Server {
+	return &server{cfg: cfg}
 }
 
 // Register
-func (s *Server) Register(service ...ServiceFactory) {
-	s.service = append(s.service, service...)
+func (s *server) Register(factory ServiceFactory) {
+	s.factory = factory
 }
 
 // Start
-func (s *Server) Start() error {
-	addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
-	lis, err := net.Listen("tcp", addr)
+func (s *server) Start(options ...grpc.ServerOption) error {
+	lis, err := net.Listen("tcp", s.cfg.Address())
 	if err != nil {
 		return err
 	}
@@ -69,20 +53,17 @@ func (s *Server) Start() error {
 		if err != nil {
 			return err
 		}
-		s.options = append(s.options, grpc.Creds(tls))
+		options = append(options, grpc.Creds(tls))
 	}
 
 	//
-	server := grpc.NewServer(s.options...)
+	server := grpc.NewServer(options...)
 	defer func() {
 		cli.Deregister()
 		server.GracefulStop()
 	}()
 
 	// 注册服务
-	for _, service := range s.service {
-		service(s.cfg, server)
-	}
-
+	s.factory(server)
 	return server.Serve(lis)
 }

@@ -8,7 +8,11 @@ import (
 )
 
 type (
-	Client struct {
+	Client interface {
+		Invoke(ctx context.Context, invoker grpcx.Invoker, request interface{}) (interface{}, error)
+	}
+
+	client struct {
 		cfg *ClientConf
 	}
 
@@ -16,11 +20,11 @@ type (
 )
 
 // NewClient
-func NewClient(cfg *ClientConf, options ...ClientOption) *Client {
+func NewClient(cfg *ClientConf, options ...ClientOption) Client {
 	for _, opt := range options {
 		opt(cfg)
 	}
-	client := &Client{cfg: cfg}
+	client := &client{cfg: cfg}
 	return client
 }
 
@@ -46,7 +50,7 @@ func ClientToken(token string) ClientOption {
 }
 
 // Invoke
-func (c *Client) Invoke(ctx context.Context, invoker grpcx.Invoker, request interface{}) (interface{}, error) {
+func (c *client) Invoke(ctx context.Context, invoker grpcx.Invoker, request interface{}) (interface{}, error) {
 	instancer, err := discov.NewClient(&c.cfg.Etcd).NewInstancer(c.cfg.Address)
 	if err != nil {
 		return nil, err

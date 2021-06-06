@@ -14,7 +14,7 @@ type (
 	}
 
 	service struct {
-		e         endpoint.Endpoint
+		logic     endpoint.Endpoint
 		decode    grpctranspot.DecodeRequestFunc
 		encode    grpctranspot.EncodeResponseFunc
 		before    []grpctranspot.ServerRequestFunc
@@ -28,10 +28,8 @@ type (
 )
 
 // NewService
-func NewService(e endpoint.Endpoint, options ...ServiceOption) Service {
-	s := &service{
-		e: e,
-	}
+func NewService(logic endpoint.Endpoint, options ...ServiceOption) Service {
+	s := &service{logic: logic}
 	for _, opt := range options {
 		opt(s)
 	}
@@ -66,6 +64,7 @@ func ServiceEncode(enc grpctranspot.EncodeResponseFunc) ServiceOption {
 	}
 }
 
+// ServiceHandleErr
 func ServiceHandleErr(errHandler HandleErrFunc) ServiceOption {
 	return func(r *service) {
 		r.handleErr = errHandler
@@ -99,7 +98,7 @@ func (s *service) Serve(ctx context.Context, request interface{}) (response inte
 		}
 	}
 
-	response, err = s.e(ctx, request)
+	response, err = s.logic(ctx, request)
 	if err != nil {
 		s.handleErr(ctx, err)
 		return nil, err

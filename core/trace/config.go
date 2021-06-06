@@ -1,4 +1,4 @@
-package jaegerx
+package trace
 
 import (
 	jaegercfg "github.com/uber/jaeger-client-go/config"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Tooooommy/go-one/server"
+	"github.com/Tooooommy/go-one/server/conf"
 	"github.com/Tooooommy/go-one/server/ginx"
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +9,7 @@ import (
 func main() {
 	router := gin.Default()
 	cfg := ginx.Conf{
-		Conf: server.Conf{
+		Conf: conf.Conf{
 			Name: "go-one",
 			Host: "127.0.0.1",
 			Port: 8080,
