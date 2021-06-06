@@ -15,38 +15,12 @@ type (
 	client struct {
 		cfg *ClientConf
 	}
-
-	ClientOption func(c *ClientConf)
 )
 
 // NewClient
-func NewClient(cfg *ClientConf, options ...ClientOption) Client {
-	for _, opt := range options {
-		opt(cfg)
-	}
+func NewClient(cfg *ClientConf) Client {
 	client := &client{cfg: cfg}
 	return client
-}
-
-// ClientRetries
-func ClientRetries(retries int) ClientOption {
-	return func(c *ClientConf) {
-		c.Retries = retries
-	}
-}
-
-// ClientTimeout
-func ClientTimeout(timeout int64) ClientOption {
-	return func(c *ClientConf) {
-		c.Timeout = timeout
-	}
-}
-
-// ClientToken
-func ClientToken(token string) ClientOption {
-	return func(c *ClientConf) {
-		c.Token = token
-	}
 }
 
 // Invoke
