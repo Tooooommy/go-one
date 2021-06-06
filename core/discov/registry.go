@@ -5,7 +5,6 @@ import (
 	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/etcdv3"
 	"strconv"
-	"time"
 )
 
 type (
@@ -31,15 +30,9 @@ func (c *Client) Register() error {
 	if err != nil {
 		return err
 	}
-	heartbeat := time.Duration(c.cfg.Heartbeat) * time.Second
-	ttl := time.Duration(c.cfg.Ttl) * time.Second
 	for index, host := range c.cfg.Hosts {
 		key := c.cfg.Name + "-" + strconv.Itoa(index)
-		err := cli.Register(etcdv3.Service{
-			Key:   key,
-			Value: host,
-			TTL:   etcdv3.NewTTLOption(heartbeat, ttl),
-		})
+		err := cli.Register(etcdv3.Service{Key: key, Value: host})
 		if err != nil {
 			return err
 		}

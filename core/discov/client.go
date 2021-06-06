@@ -24,11 +24,12 @@ func NewClient(cfg *Config) *Client {
 func (c *Client) getClient() (etcdv3.Client, error) {
 	val, ok := manager.Get(c.cfg.Name)
 	if !ok {
-		cli, err := etcdv3.NewClient(
-			context.Background(),
-			c.cfg.Hosts,
-			c.cfg.ClientOptions(),
-		)
+		ctx := context.Background()
+		opt := etcdv3.ClientOptions{
+			Username: c.cfg.Username,
+			Password: c.cfg.Password,
+		}
+		cli, err := etcdv3.NewClient(ctx, c.cfg.Hosts, opt)
 		if err != nil {
 			return nil, err
 		}
