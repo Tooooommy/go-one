@@ -2,7 +2,7 @@ package meili
 
 import "fmt"
 
-type Config struct {
+type Conf struct {
 	Address  string `json:"address"`
 	ApiKey   string `json:"api_key"`
 	PoolSize int    `json:"pool_size"`
@@ -12,11 +12,11 @@ type Config struct {
 }
 
 // DSN
-func (cfg *Config) DSN() string {
-	return fmt.Sprintf("%s%s", cfg.Address, cfg.ApiKey)
+func (c *Conf) DSN() string {
+	return fmt.Sprintf("%s%s", c.Address, c.ApiKey)
 }
 
 // NewClient
-func (cfg *Config) NewClient() (*Client, error) {
-	return NewClient(cfg)
+func (c *Conf) NewClient() Client {
+	return NewClient(c)
 }

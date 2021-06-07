@@ -21,9 +21,6 @@ type (
 		cfg  *Conf
 		pool pool.Pool
 	}
-
-	// Option set client config
-	Option func(*Conf)
 )
 
 // NewClient

@@ -1,36 +1,47 @@
 package meili
 
 import (
+	"github.com/Tooooommy/go-one/core/syncx"
 	meili "github.com/meilisearch/meilisearch-go"
 )
 
 type (
-	Client struct {
-		cfg *Config
-		orm meili.ClientInterface
+	Client interface {
+		Conn() (meili.ClientInterface, error)
 	}
-	ClientOption func(*Config)
+	client struct {
+		cfg *Conf
+	}
+)
+
+var (
+	manager = syncx.NewManager()
 )
 
 // NewClient
-func NewClient(cfg *Config) (*Client, error) {
+func NewClient(cfg *Conf) Client {
+	return &client{cfg: cfg}
+}
+
+// getClient
+func (c *client) getClient() (meili.ClientInterface, error) {
+	val, ok := manager.Get(c.cfg.Address)
+	if ok {
+		return val.(meili.ClientInterface), nil
+	}
 	cli := meili.NewClient(meili.Config{
-		Host:   cfg.Address,
-		APIKey: cfg.ApiKey,
+		Host:   c.cfg.Address,
+		APIKey: c.cfg.ApiKey,
 	})
 	err := cli.Health().Get()
-	return &Client{
-		cfg: cfg,
-		orm: cli,
-	}, err
+	if err != nil {
+		return nil, err
+	}
+	manager.Set(c.cfg.Address, cli)
+	return cli, nil
 }
 
-// ORM
-func (c *Client) ORM() meili.ClientInterface {
-	return c.orm
-}
-
-// CFG
-func (c *Client) CFG() *Config {
-	return c.cfg
+// Conn
+func (c *client) Conn() (meili.ClientInterface, error) {
+	return c.getClient()
 }
