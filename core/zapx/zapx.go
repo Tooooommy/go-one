@@ -1,6 +1,8 @@
 package zapx
 
 import (
+	"context"
+	"github.com/Tooooommy/go-one/tools"
 	"github.com/go-kit/kit/log"
 	kitlog "github.com/go-kit/kit/log/zap"
 	"github.com/natefinch/lumberjack"
@@ -86,38 +88,55 @@ func KitL() log.Logger {
 	return kitlog.NewZapSugarLogger(_zapx.log, zapcore.Level(_zapx.cfg.Level))
 }
 
-func L() *zap.Logger {
+func L(ctx context.Context) *zap.Logger {
+	key, name, err := tools.ExtractTraceKeyFromCtx(ctx)
+	if err == nil {
+		_zapx.log = _zapx.log.With(
+			zap.String("trace_key", key),
+			zap.String("span_name", name))
+	} else if err != tools.ErrNotExistTraceSpan {
+		_zapx.log = _zapx.log.With(
+			zap.String("trace_err", err.Error()))
+	}
 	return _zapx.log
 }
 
-func S() *zap.SugaredLogger {
+func S(ctx context.Context) *zap.SugaredLogger {
+	key, name, err := tools.ExtractTraceKeyFromCtx(ctx)
+	if err == nil {
+		_zapx.sug = _zapx.sug.
+			With("trace_key", key).
+			With("span_name", name)
+	} else if err != tools.ErrNotExistTraceSpan {
+		_zapx.sug = _zapx.sug.With("trace_err", err.Error())
+	}
 	return _zapx.sug
 }
 
-func Debug() ZapxLogger {
-	return newZapx(zapcore.DebugLevel)
+func Debug(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.DebugLevel)
 }
 
-func Info() ZapxLogger {
-	return newZapx(zapcore.InfoLevel)
+func Info(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.InfoLevel)
 }
 
-func Warn() ZapxLogger {
-	return newZapx(zapcore.WarnLevel)
+func Warn(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.WarnLevel)
 }
 
-func Error() ZapxLogger {
-	return newZapx(zapcore.ErrorLevel)
+func Error(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.ErrorLevel)
 }
 
-func Dpanic() ZapxLogger {
-	return newZapx(zapcore.DPanicLevel)
+func Dpanic(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.DPanicLevel)
 }
 
-func Panic() ZapxLogger {
-	return newZapx(zapcore.PanicLevel)
+func Panic(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.PanicLevel)
 }
 
-func Fatal() ZapxLogger {
-	return newZapx(zapcore.FatalLevel)
+func Fatal(ctx context.Context) ZapxLogger {
+	return newZapx(ctx, zapcore.FatalLevel)
 }

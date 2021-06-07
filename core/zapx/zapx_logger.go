@@ -1,6 +1,7 @@
 package zapx
 
 import (
+	"context"
 	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -82,12 +83,14 @@ type ZapxLogger interface {
 }
 
 type zapx struct {
+	ctx    context.Context
 	fields []zap.Field
 	level  zapcore.Level
 }
 
-func newZapx(level zapcore.Level) *zapx {
+func newZapx(ctx context.Context, level zapcore.Level) *zapx {
 	return &zapx{
+		ctx:    ctx,
 		fields: nil,
 		level:  level,
 	}
@@ -444,7 +447,7 @@ func (z *zapx) Any(key string, value interface{}) ZapxLogger {
 }
 
 func (z *zapx) Msg(s string) {
-	l := _zapx.log.With(z.fields...)
+	l := L(z.ctx).With(z.fields...)
 	switch z.level {
 	case zapcore.DebugLevel:
 		l.Debug(s)
