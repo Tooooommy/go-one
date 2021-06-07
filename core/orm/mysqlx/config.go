@@ -1,19 +1,23 @@
 package mysqlx
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Config struct {
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	Database        string `json:"database"`
-	Address         string `json:"address"`
-	Charset         string `json:"charset"`
-	Loc             string `json:"loc"`
-	Timeout         int    `json:"timeout"`
-	MaxOpenConns    int    `json:"max_open_conns"`
-	MaxIdleConns    int    `json:"max_idle_conns"`
-	ConnMaxLifetime int    `json:"conn_max_lifetime"`
-	ConnMaxIdleTime int    `json:"conn_max_idle_time"`
+	Username        string        `json:"username"`
+	Password        string        `json:"password"`
+	Database        string        `json:"database"`
+	Address         string        `json:"address"`
+	Charset         string        `json:"charset"`
+	Loc             string        `json:"loc"`
+	Timeout         time.Duration `json:"timeout"`
+	MaxOpenConns    int           `json:"max_open_conns"`
+	MaxIdleConns    int           `json:"max_idle_conns"`
+	ConnMaxLifetime time.Duration `json:"conn_max_lifetime"`
+	ConnMaxIdleTime time.Duration `json:"conn_max_idle_time"`
+	TablePrefix     string        `json:"table_prefix"`
 }
 
 func DefaultConfig() *Config {
