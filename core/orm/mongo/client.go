@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"github.com/Tooooommy/go-one/core/syncx"
 	"go.mongodb.org/mongo-driver/mongo"
 	mgoptions "go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -9,55 +10,54 @@ import (
 )
 
 type (
-	Client struct {
-		cfg *Config
-		orm *mongo.Client
+	Client interface {
+		Conn() (*mongo.Client, error)
 	}
-	Option func(cfg *Config)
+
+	client struct {
+		cfg *Conf
+	}
 )
 
-func NewClient(options ...Option) (*Client, error) {
-	cfg := DefaultConfig()
-	for _, opt := range options {
-		opt(cfg)
-	}
+var (
+	manager = syncx.NewManager()
+)
 
-	opt := mgoptions.Client().ApplyURI(cfg.DSN())
-	if cfg.MaxConnIdleTime > 0 {
-		opt.SetMaxConnIdleTime(time.Duration(cfg.MaxConnIdleTime) * time.Millisecond)
+// NewClient
+func NewClient(cfg *Conf) Client {
+	return &client{cfg: cfg}
+}
+
+func (c *client) getConn() (*mongo.Client, error) {
+	dsn := c.cfg.DSN()
+	val, ok := manager.Get(dsn)
+	if ok {
+		return val.(*mongo.Client), nil
 	}
-	if cfg.MaxPoolSize > 0 {
-		opt.SetMaxPoolSize(cfg.MaxPoolSize)
+	opt := mgoptions.Client().ApplyURI(dsn)
+	if c.cfg.MaxConnIdleTime > 0 {
+		opt.SetMaxConnIdleTime(time.Duration(c.cfg.MaxConnIdleTime) * time.Millisecond)
 	}
-	if cfg.MinPoolSize > 0 {
-		opt.SetMinPoolSize(cfg.MinPoolSize)
+	if c.cfg.MaxPoolSize > 0 {
+		opt.SetMaxPoolSize(c.cfg.MaxPoolSize)
+	}
+	if c.cfg.MinPoolSize > 0 {
+		opt.SetMinPoolSize(c.cfg.MinPoolSize)
 	}
 
 	cli, err := mongo.NewClient(opt)
 	if err != nil {
 		return nil, err
 	}
-
-	client := &Client{cfg: cfg, orm: cli}
-	err = client.Ping()
-	return client, err
+	err = cli.Ping(context.Background(), readpref.Primary())
+	if err != nil {
+		return nil, err
+	}
+	manager.Set(dsn, cli)
+	return cli, err
 }
 
-// Ping
-func (c *Client) Ping() error {
-	return c.orm.Ping(context.Background(), readpref.Primary())
-}
-
-func (c *Client) Close() error {
-	return c.orm.Disconnect(context.Background())
-}
-
-// ORM
-func (c *Client) ORM() *mongo.Client {
-	return c.orm
-}
-
-// CFG
-func (c *Client) CFG() *Config {
-	return c.cfg
+// Conn
+func (c *client) Conn() (*mongo.Client, error) {
+	return c.getConn()
 }

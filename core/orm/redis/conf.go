@@ -13,7 +13,7 @@ const (
 	ClusterType RedisType = "cluster"
 )
 
-type Config struct {
+type Conf struct {
 	Type        RedisType `json:"type"`
 	Address     []string  `json:"address"`
 	Username    string    `json:"username"`
@@ -26,8 +26,8 @@ type Config struct {
 	Tls         bool      `json:"tls"`
 }
 
-func DefaultConfig() *Config {
-	return &Config{
+func DefaultConf() *Conf {
+	return &Conf{
 		Type:        NodeType,
 		Address:     []string{"127.0.0.1:6379"},
 		Database:    0,
@@ -38,7 +38,7 @@ func DefaultConfig() *Config {
 	}
 }
 
-func (cfg *Config) TLSConfig() *tls.Config {
+func (cfg *Conf) TLSConfig() *tls.Config {
 	if cfg.Tls {
 		return &tls.Config{
 			InsecureSkipVerify: false,
@@ -47,7 +47,7 @@ func (cfg *Config) TLSConfig() *tls.Config {
 	return nil
 }
 
-func (cfg *Config) RedisOptions() *redis.Options {
+func (cfg *Conf) RedisOptions() *redis.Options {
 	opt := &redis.Options{
 		Addr:         cfg.Address[0],
 		Username:     cfg.Username,
@@ -64,7 +64,7 @@ func (cfg *Config) RedisOptions() *redis.Options {
 	return opt
 }
 
-func (cfg *Config) ClusterOptions() *redis.ClusterOptions {
+func (cfg *Conf) ClusterOptions() *redis.ClusterOptions {
 	opt := &redis.ClusterOptions{
 		Addrs:        cfg.Address,
 		Username:     cfg.Username,

@@ -14,36 +14,30 @@ var (
 )
 
 type (
-	Client struct {
-		cfg  *Config
+	Client interface {
+		Conn() (milvus.MilvusClient, error)
+	}
+	client struct {
+		cfg  *Conf
 		pool pool.Pool
 	}
 
 	// Option set client config
-	Option func(*Config)
+	Option func(*Conf)
 )
 
 // NewClient
-func NewClient(ctx context.Context, options ...Option) (*Client, error) {
-	cfg := DefaultConfig()
-	for _, opt := range options {
-		opt(cfg)
-	}
-	p, err := newPool(ctx, cfg)
+func NewClient(cfg *Conf) (Client, error) {
+	client := &client{cfg: cfg}
+	err := client.initPool()
 	if err != nil {
 		return nil, err
 	}
-	client := &Client{cfg: cfg, pool: p}
 	return client, nil
 }
 
-// Config
-func (c *Client) CFG() *Config {
-	return c.cfg
-}
-
 // ORM
-func (c *Client) ORM() (milvus.MilvusClient, error) {
+func (c *client) Conn() (milvus.MilvusClient, error) {
 	mc, err := c.pool.Get()
 	if err != nil {
 		return nil, err
@@ -56,36 +50,38 @@ func (c *Client) ORM() (milvus.MilvusClient, error) {
 }
 
 // newPool
-func newPool(ctx context.Context, cfg *Config) (pool.Pool, error) {
-	return pool.NewChannelPool(&pool.Config{
-		InitialCap: cfg.PoolSize,
-		MaxCap:     cfg.MaxConn,
-		MaxIdle:    cfg.MaxIdle,
+func (c *client) initPool() (err error) {
+	c.pool, err = pool.NewChannelPool(&pool.Config{
+		InitialCap: c.cfg.PoolSize,
+		MaxCap:     c.cfg.MaxConn,
+		MaxIdle:    c.cfg.MaxIdle,
 		Factory: func() (interface{}, error) {
-			return newClient(ctx, cfg.Address)
+			return c.getClient()
 		},
 		Close: func(i interface{}) error {
 			if client, ok := i.(milvus.MilvusClient); !ok {
 				return ErrClientInvalid
 			} else {
-				return client.Disconnect(ctx)
+				return client.Disconnect(context.Background())
 			}
 		},
 		Ping: func(i interface{}) error {
 			if client, ok := i.(milvus.MilvusClient); !ok {
 				return ErrClientInvalid
-			} else if !client.IsConnected(ctx) {
+			} else if !client.IsConnected(context.Background()) {
 				return ErrConnectClosed
 			}
 			return nil
 		},
-		IdleTimeout: time.Duration(cfg.Timeout) * time.Second,
+		IdleTimeout: time.Duration(c.cfg.Timeout) * time.Second,
 	})
+	return
 }
 
-// newClient
-func newClient(ctx context.Context, address string) (milvus.MilvusClient, error) {
-	host, port := resolverAddr(address)
+// getClient
+func (c *client) getClient() (milvus.MilvusClient, error) {
+	ctx := context.Background()
+	host, port := resolverAddr(c.cfg.Address)
 	param := milvus.ConnectParam{IPAddress: host, Port: port}
 	cli, err := milvus.NewMilvusClient(ctx, param)
 	if err != nil {

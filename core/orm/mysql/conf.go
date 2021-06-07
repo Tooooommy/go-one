@@ -1,11 +1,11 @@
-package mysqlx
+package mysql
 
 import (
 	"fmt"
 	"time"
 )
 
-type Config struct {
+type Conf struct {
 	Username        string        `json:"username"`
 	Password        string        `json:"password"`
 	Database        string        `json:"database"`
@@ -20,8 +20,8 @@ type Config struct {
 	TablePrefix     string        `json:"table_prefix"`
 }
 
-func DefaultConfig() *Config {
-	return &Config{
+func DefaultConf() *Conf {
+	return &Conf{
 		Username:        "root",
 		Password:        "root",
 		Database:        "master",
@@ -36,7 +36,7 @@ func DefaultConfig() *Config {
 	}
 }
 
-func (cfg *Config) DSN() string {
+func (cfg *Conf) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=%s&timeout=%ds",
 		cfg.Username, cfg.Password, cfg.Address, cfg.Database, cfg.Charset, cfg.Loc, cfg.Timeout)
 }

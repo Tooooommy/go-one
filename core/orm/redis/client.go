@@ -23,10 +23,10 @@ type (
 	}
 
 	client struct {
-		cfg *Config
+		cfg *Conf
 		orm Node
 	}
-	Option func(cfg *Config)
+	Option func(cfg *Conf)
 )
 
 var (
@@ -34,7 +34,7 @@ var (
 )
 
 // NewClient
-func NewClient(cfg *Config) *client {
+func NewClient(cfg *Conf) *client {
 	return &client{cfg: cfg}
 }
 

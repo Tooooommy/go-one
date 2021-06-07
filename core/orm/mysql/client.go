@@ -1,4 +1,4 @@
-package mysqlx
+package mysql
 
 import (
 	"database/sql"
@@ -20,7 +20,7 @@ type (
 	}
 
 	client struct {
-		cfg *Config
+		cfg *Conf
 	}
 )
 
@@ -29,7 +29,7 @@ var (
 )
 
 // NewClient
-func NewClient(cfg *Config) Client {
+func NewClient(cfg *Conf) Client {
 	return &client{cfg: cfg}
 }
 

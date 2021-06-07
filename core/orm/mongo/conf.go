@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Config struct {
+type Conf struct {
 	Username        string            `json:"username"`
 	Password        string            `json:"password"`
 	Address         []string          `json:"address"`
@@ -16,8 +16,8 @@ type Config struct {
 	MinPoolSize     uint64            `json:"min_pool_size"`
 }
 
-func DefaultConfig() *Config {
-	return &Config{
+func DefaultConf() *Conf {
+	return &Conf{
 		Username:        "admin",
 		Password:        "admin",
 		Address:         []string{"127.0.0.1:27017"},
@@ -28,7 +28,7 @@ func DefaultConfig() *Config {
 	}
 }
 
-func (cfg *Config) DSN() string {
+func (cfg *Conf) DSN() string {
 	address := strings.Join(cfg.Address, ",")
 	var opts []string
 	for k, v := range cfg.Options {
@@ -36,4 +36,8 @@ func (cfg *Config) DSN() string {
 	}
 	opt := strings.Join(opts, "&")
 	return fmt.Sprintf("mongdb://%s:%s@%s/%s?%s", cfg.Username, cfg.Password, address, cfg.Database, opt)
+}
+
+func (cfg *Conf) NewClient() Client {
+	return NewClient(cfg)
 }
