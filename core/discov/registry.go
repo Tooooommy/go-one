@@ -26,7 +26,7 @@ func (c *Client) Register() error {
 		return nil
 	}
 	// 注册服务
-	cli, err := c.getClient()
+	cli, err := c.getConn()
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (c *Client) Deregister() error {
 	if c.cfg.HaveEtcd() {
 		return nil
 	}
-	cli, err := c.getClient()
+	cli, err := c.getConn()
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (c *Client) Deregister() error {
 
 func (c *Client) NewInstancer(prefix string) (sd.Instancer, error) {
 	if c.cfg.HaveEtcd() {
-		cli, err := c.getClient()
+		cli, err := c.getConn()
 		if err != nil {
 			return nil, err
 		}

@@ -21,7 +21,7 @@ func NewClient(cfg *Config) *Client {
 	return client
 }
 
-func (c *Client) getClient() (etcdv3.Client, error) {
+func (c *Client) getConn() (etcdv3.Client, error) {
 	val, ok := manager.Get(c.cfg.Name)
 	if !ok {
 		ctx := context.Background()
