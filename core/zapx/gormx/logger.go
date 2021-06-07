@@ -1,6 +1,7 @@
 package gormx
 
 import (
+	"context"
 	"github.com/Tooooommy/go-one/core/zapx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -12,8 +13,9 @@ type Logger struct {
 }
 
 func NewLogger(level zapcore.Level) *Logger {
+	sugar := zapx.S(context.Background())
 	return &Logger{
-		sugar: zapx.S(),
+		sugar: sugar,
 		level: level,
 	}
 }
