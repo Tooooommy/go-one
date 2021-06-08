@@ -1,13 +1,14 @@
 package breaker
 
 import (
+	"context"
 	"github.com/Tooooommy/go-one/core/zapx"
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/sony/gobreaker"
 	"time"
 )
 
-type Config struct {
+type Conf struct {
 	Name            string `json:"name"`              // 熔断名字
 	Timeout         int    `json:"timeout"`           // 请求超时时间
 	MaxRequests     int    `json:"max_requests"`      // 最大并发请求
@@ -16,8 +17,8 @@ type Config struct {
 	ReqVolThreshold int    `json:"req_vol_threshold"` // 波动期内最小请求数
 }
 
-func DefaultConfig() *Config {
-	return &Config{
+func DefaultConf() *Conf {
+	return &Conf{
 		Name:            "go-one",
 		Timeout:         5,
 		MaxRequests:     5,
@@ -37,7 +38,7 @@ func readyToTrip(errPerThreshold int) func(counts gobreaker.Counts) bool {
 	return nil
 }
 
-func (cfg Config) GetGoBreakerSettings() gobreaker.Settings {
+func (cfg Conf) GetGoBreakerSettings() gobreaker.Settings {
 	return gobreaker.Settings{
 		Name:        cfg.Name,
 		MaxRequests: uint32(cfg.MaxRequests),
@@ -45,7 +46,7 @@ func (cfg Config) GetGoBreakerSettings() gobreaker.Settings {
 		Timeout:     time.Duration(cfg.Timeout) * time.Millisecond,
 		ReadyToTrip: readyToTrip(cfg.ErrPerThreshold),
 		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
-			zapx.Info().String("name", name).
+			zapx.Info(context.Background()).String("name", name).
 				Int("from_state", int(from)).
 				Int("to_state", int(to)).
 				Msg("状态发生变化")
@@ -53,7 +54,7 @@ func (cfg Config) GetGoBreakerSettings() gobreaker.Settings {
 	}
 }
 
-func (cfg Config) GetHystrixConfig() hystrix.CommandConfig {
+func (cfg Conf) GetHystrixConfig() hystrix.CommandConfig {
 	return hystrix.CommandConfig{
 		Timeout:                cfg.Timeout,
 		MaxConcurrentRequests:  cfg.MaxRequests,

@@ -9,13 +9,13 @@ import (
 
 type (
 	Breaker struct {
-		cfg *Config
+		cfg *Conf
 	}
-	Option func(cfg *Config)
+	Option func(cfg *Conf)
 )
 
 func NewBreaker(options ...Option) *Breaker {
-	cfg := DefaultConfig()
+	cfg := DefaultConf()
 	for _, opt := range options {
 		opt(cfg)
 	}
