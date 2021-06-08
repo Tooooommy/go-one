@@ -40,3 +40,7 @@ func (cfg *Conf) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=%s&timeout=%ds",
 		cfg.Username, cfg.Password, cfg.Address, cfg.Database, cfg.Charset, cfg.Loc, cfg.Timeout)
 }
+
+func (cfg *Conf) NewClient() Client {
+	return NewClient(cfg)
+}

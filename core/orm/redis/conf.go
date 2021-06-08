@@ -76,3 +76,7 @@ func (cfg *Conf) ClusterOptions() *redis.ClusterOptions {
 	}
 	return opt
 }
+
+func (cfg *Conf) NewClient() Client {
+	return NewClient(cfg)
+}

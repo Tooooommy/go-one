@@ -19,7 +19,7 @@ type (
 	}
 
 	Client interface {
-		Conn() Node
+		Conn() (Node, error)
 	}
 
 	client struct {
@@ -34,7 +34,7 @@ var (
 )
 
 // NewClient
-func NewClient(cfg *Conf) *client {
+func NewClient(cfg *Conf) Client {
 	return &client{cfg: cfg}
 }
 

@@ -12,11 +12,11 @@ type Conf struct {
 }
 
 // DSN
-func (c *Conf) DSN() string {
-	return fmt.Sprintf("%s%s", c.Address, c.ApiKey)
+func (cfg *Conf) DSN() string {
+	return fmt.Sprintf("%s%s", cfg.Address, cfg.ApiKey)
 }
 
 // NewClient
-func (c *Conf) NewClient() Client {
-	return NewClient(c)
+func (cfg *Conf) NewClient() Client {
+	return NewClient(cfg)
 }
