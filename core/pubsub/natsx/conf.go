@@ -4,13 +4,10 @@ import (
 	"strings"
 )
 
-// Config
-type Config struct {
+// Conf
+type Conf struct {
 	Name     string   `json:"name"`
 	Address  []string `json:"address"`
-	CertFile string   `json:"cert_file"`
-	KeyFile  string   `json:"key_file"`
-	Timeout  int64    `json:"timeout"`
 	Username string   `json:"username"`
 	Password string   `json:"password"`
 }
@@ -26,6 +23,6 @@ func resolverAddr(address []string) string {
 }
 
 // Connect
-func (cfg Config) Connect() (*Conn, error) {
+func (cfg *Conf) Connect() Conn {
 	return Connect(cfg)
 }

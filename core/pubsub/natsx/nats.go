@@ -1,80 +1,55 @@
 package natsx
 
 import (
-	"github.com/Tooooommy/go-one/core/pubsub"
+	"github.com/Tooooommy/go-one/core/syncx"
 	"github.com/nats-io/nats.go"
-	"time"
 )
 
-// Conn
-type Conn struct {
-	cfg  Config
-	conn *nats.Conn
-}
+// conn
+type (
+	Conn interface {
+		Conn() (*nats.Conn, error)
+		Stream() (nats.JetStreamContext, error)
+	}
+
+	conn struct {
+		cfg *Conf
+	}
+)
+
+var (
+	manager = syncx.NewManager()
+)
 
 // Connect
-func Connect(cfg Config) (*Conn, error) {
-	var options []nats.Option
-	if cfg.Name != "" {
-		options = append(options, nats.Name(cfg.Name))
-	}
-	if cfg.Username != "" && cfg.Password != "" {
-		options = append(options, nats.UserInfo(cfg.Username, cfg.Password))
-	}
+func Connect(cfg *Conf) Conn {
+	return &conn{cfg: cfg}
+}
 
-	if cfg.CertFile != "" && cfg.KeyFile != "" {
-		options = append(options, nats.ClientCert(cfg.CertFile, cfg.KeyFile))
+func (c *conn) connect() (*nats.Conn, error) {
+	addr := resolverAddr(c.cfg.Address)
+	val, ok := manager.Get(addr)
+	if ok {
+		return val.(*nats.Conn), nil
 	}
-
-	if cfg.Timeout <= 0 {
-		cfg.Timeout = 10
-	}
-	options = append(options, nats.Timeout(time.Duration(cfg.Timeout)*time.Second))
-
-	c, err := nats.Connect(resolverAddr(cfg.Address), options...)
+	conn, err := nats.Connect(addr, nats.Name(c.cfg.Name),
+		nats.UserInfo(c.cfg.Username, c.cfg.Password))
 	if err != nil {
 		return nil, err
 	}
-	conn := &Conn{cfg: cfg, conn: c}
+	manager.Set(addr, conn)
 	return conn, nil
 }
 
-// Close
-func (c *Conn) Close() {
-	c.conn.Close()
+// Conn
+func (c *conn) Conn() (*nats.Conn, error) {
+	return c.connect()
 }
 
-// CONN
-func (c *Conn) CONN() *nats.Conn {
-	return c.conn
-}
-
-// CFG
-func (c Conn) CFG() Config {
-	return c.cfg
-}
-
-// NewPublisher
-func (c *Conn) NewPublisher(subject string, reply string, timeout time.Duration) pubsub.Publisher {
-	return &publisher{conn: c, subject: subject, reply: reply, timeout: timeout}
-}
-
-// Publish
-func (c *Conn) PublishSync(msg *nats.Msg, timeout time.Duration) (*nats.Msg, error) {
-	return c.conn.RequestMsg(msg, timeout)
-}
-
-// PublishSync
-func (c *Conn) Publish(msg *nats.Msg) error {
-	return c.conn.PublishMsg(msg)
-}
-
-// NewSubscriber
-func (c *Conn) NewSubscriber(subject, queue string) pubsub.Subscriber {
-	return &subscriber{conn: c, subject: subject, queue: queue}
-}
-
-// Subscribe
-func (c *Conn) Subscribe(subject, queue string, cb nats.MsgHandler) (*nats.Subscription, error) {
-	return c.conn.QueueSubscribe(subject, queue, cb)
+func (c *conn) Stream() (nats.JetStreamContext, error) {
+	conn, err := c.connect()
+	if err != nil {
+		return nil, err
+	}
+	return conn.JetStream()
 }
