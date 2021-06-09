@@ -36,7 +36,8 @@ func Signer(secret []byte, timeout time.Duration) endpoint.Middleware {
 			if err != nil {
 				return nil, err
 			}
-			claims, ok := ctx.Value(kitjwt.JWTClaimsContextKey).(jwt.MapClaims)
+
+			claims, ok := response.(jwt.MapClaims)
 			if !ok {
 				return response, nil
 			}

@@ -1,32 +1,32 @@
-package httpx
+package jsonx
 
 const (
-	Failure = iota
+	Failure = iota - 1
 	Success
 )
 
-// JSONResponse
-type JSONResponse struct {
+// Response
+type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
 }
 
-// RawJSON: return raw JSONResponse
-func RawJSON(code int, msg string, data interface{}) *JSONResponse {
-	return &JSONResponse{
+// RawJSON: return raw Response
+func RawJSON(code int, msg string, data interface{}) *Response {
+	return &Response{
 		Code: code,
 		Msg:  msg,
 		Data: data,
 	}
 }
 
-// JSON: return success JSONResponse
-func JSON(data interface{}) *JSONResponse {
+// JSON: return success Response
+func JSON(data interface{}) *Response {
 	return RawJSON(Success, "success", data)
 }
 
-// Assert: assert bool and panic
+// Assert: assert bool and panic Response
 func Assert(bo bool, code int, msg string, ds ...interface{}) {
 	if !bo {
 		var data interface{}
@@ -37,7 +37,7 @@ func Assert(bo bool, code int, msg string, ds ...interface{}) {
 	}
 }
 
-// CheckErr: check err and panic
+// CheckErr: check err and panic Response
 func CheckErr(err error, cs ...int) {
 	if err != nil {
 		var code = Failure
