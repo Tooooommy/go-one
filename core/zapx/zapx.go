@@ -15,14 +15,11 @@ func init() {
 	NewZapx(&Conf{Name: "go-one", Level: -1})
 }
 
-type (
-	Zapx struct {
-		log *zap.Logger
-		sug *zap.SugaredLogger
-		cfg *Conf
-	}
-	Option func(*Zapx)
-)
+type Zapx struct {
+	log *zap.Logger
+	sug *zap.SugaredLogger
+	cfg *Conf
+}
 
 var _zapx *Zapx
 
@@ -53,37 +50,6 @@ func NewZapx(cfg *Conf) {
 		cfg: cfg,
 	}
 	zap.ReplaceGlobals(_zapx.log)()
-}
-
-func StdMode(cfg *Conf) Option {
-	return func(zapx *Zapx) {
-		l := zap.NewAtomicLevelAt(zapcore.Level(cfg.Level))
-		w := zapcore.AddSync(os.Stdout)
-		c := zap.NewProductionEncoderConfig()
-		c.EncodeTime = zapcore.ISO8601TimeEncoder
-		core := zapcore.NewCore(zapcore.NewJSONEncoder(c), w, l)
-		_zapx.log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-		_zapx.cfg = cfg
-	}
-}
-
-func LogMode(cfg *Conf) Option {
-	return func(zapx *Zapx) {
-		l := zap.NewAtomicLevelAt(zapcore.Level(cfg.Level))
-		w := zapcore.AddSync(&lumberjack.Logger{
-			Filename:   cfg.Filename,
-			MaxSize:    cfg.MaxSize,
-			MaxAge:     cfg.MaxAge,
-			MaxBackups: cfg.MaxBackups,
-			LocalTime:  cfg.LocalTime,
-			Compress:   cfg.Compress,
-		})
-		c := zap.NewProductionEncoderConfig()
-		c.EncodeTime = zapcore.ISO8601TimeEncoder
-		core := zapcore.NewCore(zapcore.NewJSONEncoder(c), w, l)
-		_zapx.log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-		_zapx.cfg = cfg
-	}
 }
 
 func KitL() kitlog.Logger {
