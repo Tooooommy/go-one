@@ -23,7 +23,7 @@ func NewServer(cfg *ServerConf) *server {
 	return s
 }
 
-// WithEngine: 设置GinEngine
+// Register 注册gin Engine
 func (s *server) Register(eng *gin.Engine) {
 	s.eng = eng
 }

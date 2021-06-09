@@ -4,6 +4,7 @@ import (
 	"github.com/Tooooommy/go-one/server/conf"
 )
 
+// ServerConf
 type ServerConf struct {
 	conf.Conf
 	MaxConns int   `json:"max_conns"`
