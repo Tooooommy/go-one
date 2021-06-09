@@ -7,7 +7,7 @@ import (
 type (
 	Server interface {
 		Register(eng *gin.Engine)
-		Start() error
+		Serve() error
 	}
 
 	// server
@@ -29,7 +29,7 @@ func (s *server) Register(eng *gin.Engine) {
 }
 
 // Start: 启动服务
-func (s *server) Start() error {
+func (s *server) Serve() error {
 	if s.cfg.HaveCert() {
 		return s.eng.RunTLS(s.cfg.Address(), s.cfg.CertFile, s.cfg.KeyFile)
 	} else {
