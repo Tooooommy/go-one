@@ -2,31 +2,20 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"github.com/Tooooommy/go-one/core/syncx"
-	"io"
 	"strings"
 
 	"github.com/go-redis/redis/v8"
 )
 
 type (
-	Node interface {
-		redis.Cmdable
-		io.Closer
-		redis.Scripter
-		redis.UniversalClient
-	}
-
 	Client interface {
-		Conn() (Node, error)
+		Conn() (redis.UniversalClient, error)
 	}
 
 	client struct {
 		cfg *Conf
-		orm Node
 	}
-	Option func(cfg *Conf)
 )
 
 var (
@@ -38,37 +27,23 @@ func NewClient(cfg *Conf) Client {
 	return &client{cfg: cfg}
 }
 
-func (c *client) getConn() (Node, error) {
+func (c *client) getConn() (redis.UniversalClient, error) {
 	addr := strings.Join(c.cfg.Address, ",")
 	val, ok := manager.Get(addr)
 	if ok {
-		return val.(Node), nil
+		return val.(redis.UniversalClient), nil
 	}
-	var node Node
-	switch c.cfg.Type {
-	case NodeType:
-		node = redis.NewClient(c.cfg.RedisOptions())
-		node.AddHook(&TracingHook{})
-	case ClusterType:
-		opt := c.cfg.ClusterOptions()
-		opt.NewClient = func(opt *redis.Options) *redis.Client {
-			node := redis.NewClient(opt)
-			node.AddHook(&TracingHook{})
-			return node
-		}
-		node = redis.NewClusterClient(opt)
-	default:
-		return nil, fmt.Errorf("redis type '%s' is not supported", c.cfg.Type)
-	}
-	err := node.Ping(context.Background()).Err()
+	cli := redis.NewUniversalClient(c.cfg.UniversalOptions())
+	cli.AddHook(&TracingHook{})
+	err := cli.Ping(context.Background()).Err()
 	if err != nil {
 		return nil, err
 	}
-	manager.Set(addr, node)
-	return node, err
+	manager.Set(addr, cli)
+	return cli, err
 }
 
 // Conn
-func (c *client) Conn() (Node, error) {
+func (c *client) Conn() (redis.UniversalClient, error) {
 	return c.getConn()
 }
