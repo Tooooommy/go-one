@@ -1,4 +1,4 @@
-package trace
+package hooks
 
 import (
 	"github.com/Tooooommy/go-one/core/metrics"

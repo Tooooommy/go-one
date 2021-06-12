@@ -16,7 +16,7 @@ import (
 func TestNewJaegerTracer(t *testing.T) {
 	carrier := http.Header{}
 
-	closer, err := InitTracer(&Config{
+	closer, err := InitTracer(&Conf{
 		Name: "go-one",
 		Sampler: Sampler{
 			Type:  "const",

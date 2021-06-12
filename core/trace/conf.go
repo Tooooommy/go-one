@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Config struct {
+type Conf struct {
 	Name     string   `json:"name"`
 	Disabled bool     `json:"disabled"`
 	Sampler  Sampler  `json:"sampler"`
@@ -32,7 +32,7 @@ type Reporter struct {
 	Endpoint      string `json:"endpoint"`
 }
 
-func (cfg *Config) JaegerConfig() *jaegercfg.Configuration {
+func (cfg *Conf) JaegerConf() *jaegercfg.Configuration {
 	c := &jaegercfg.Configuration{
 		ServiceName: cfg.Name,
 		Disabled:    cfg.Disabled,
