@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
+	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -17,12 +18,15 @@ require (
 	github.com/go-redis/redis/extra/rediscmd/v8 v8.8.2
 	github.com/go-redis/redis/v8 v8.8.3
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/golang-migrate/migrate/v4 v4.14.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
+	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
+	github.com/jackc/pgx v3.2.0+incompatible // indirect
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect

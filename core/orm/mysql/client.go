@@ -37,18 +37,7 @@ func (c *client) getConn(dsn string) (*gorm.DB, error) {
 		return val.(*gorm.DB), nil
 	}
 
-	gdb, err := gorm.Open(mysql.Open(dsn),
-		&gorm.Config{NamingStrategy: schema.NamingStrategy{TablePrefix: c.cfg.TablePrefix},
-			Logger: logger.New(gormx.NewLogger(zapcore.InfoLevel),
-				logger.Config{
-					SlowThreshold:             0,
-					Colorful:                  true,
-					IgnoreRecordNotFoundError: true,
-					LogLevel:                  logger.Info,
-				},
-			),
-		},
-	)
+	gdb, err := gorm.Open(mysql.Open(dsn), getGormConfig(c.cfg.TablePrefix))
 	if err != nil {
 		return nil, err
 	}
@@ -79,4 +68,18 @@ func (c *client) getConn(dsn string) (*gorm.DB, error) {
 // Conn
 func (c *client) Conn() (*gorm.DB, error) {
 	return c.getConn(c.cfg.DSN())
+}
+
+func getGormConfig(tablePrefix string) *gorm.Config {
+	return &gorm.Config{NamingStrategy: schema.NamingStrategy{TablePrefix: tablePrefix},
+		Logger: logger.New(
+			gormx.NewLogger(zapcore.InfoLevel),
+			logger.Config{
+				SlowThreshold:             0,
+				Colorful:                  true,
+				IgnoreRecordNotFoundError: true,
+				LogLevel:                  logger.Info,
+			},
+		),
+	}
 }
