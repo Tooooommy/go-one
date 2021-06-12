@@ -26,14 +26,15 @@ var (
 	manager = syncx.NewManager()
 )
 
-// NewClient
+// NewClient new client instance contains conf
 func NewClient(cfg *Conf) Client {
 	return &client{cfg: cfg}
 }
 
+// getConn get client gorm db from dsn:conf
 func (c *client) getConn(dsn string) (*gorm.DB, error) {
-	val, exist := manager.Get(dsn)
-	if exist {
+	val, ok := manager.Get(dsn)
+	if ok {
 		return val.(*gorm.DB), nil
 	}
 
@@ -41,26 +42,33 @@ func (c *client) getConn(dsn string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	db, err := gdb.DB()
 	if err != nil {
 		return nil, err
 	}
+
 	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
+
 	if c.cfg.ConnMaxIdleTime > 0 {
 		db.SetConnMaxIdleTime(c.cfg.ConnMaxIdleTime)
 	}
+
 	if c.cfg.ConnMaxLifetime > 0 {
 		db.SetConnMaxLifetime(c.cfg.ConnMaxLifetime)
 	}
+
 	if c.cfg.MaxIdleConns > 0 {
 		db.SetMaxIdleConns(c.cfg.MaxIdleConns)
 	}
+
 	if c.cfg.MaxOpenConns > 0 {
 		db.SetMaxOpenConns(c.cfg.MaxOpenConns)
 	}
+
 	manager.Set(dsn, gdb)
 	return gdb, nil
 }
