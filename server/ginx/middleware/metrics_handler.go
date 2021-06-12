@@ -8,7 +8,7 @@ import (
 )
 
 // MetricsHandler: 开启普罗米修斯
-func MetricsHandler(m *metrics.Metrics) gin.HandlerFunc {
+func MetricsHandler(m *metrics.metrics) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		n := time.Now()
 		defer func() {

@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/Tooooommy/go-one/core/zapx"
+	jaegercfg "github.com/uber/jaeger-client-go/config"
 )
 
 type logger struct{}
 
-func NewLogger() *logger {
-	return &logger{}
+func NewLogger() jaegercfg.Option {
+	return jaegercfg.Logger(&logger{})
 }
 
 func (*logger) Error(msg string) {

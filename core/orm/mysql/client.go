@@ -4,6 +4,7 @@ import (
 	"github.com/Tooooommy/go-one/core/syncx"
 	"github.com/Tooooommy/go-one/core/zapx/gormx"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ import (
 type (
 	Client interface {
 		Conn() (*gorm.DB, error)
+		Connx() (*sqlx.DB, error)
 	}
 
 	client struct {
@@ -73,11 +75,7 @@ func (c *client) getConn(dsn string) (*gorm.DB, error) {
 	return gdb, nil
 }
 
-// Conn
-func (c *client) Conn() (*gorm.DB, error) {
-	return c.getConn(c.cfg.DSN())
-}
-
+// getGormConfig
 func getGormConfig(tablePrefix string) *gorm.Config {
 	return &gorm.Config{NamingStrategy: schema.NamingStrategy{TablePrefix: tablePrefix},
 		Logger: logger.New(
@@ -90,4 +88,22 @@ func getGormConfig(tablePrefix string) *gorm.Config {
 			},
 		),
 	}
+}
+
+// Conn
+func (c *client) Conn() (*gorm.DB, error) {
+	return c.getConn(c.cfg.DSN())
+}
+
+// Connx
+func (c *client) Connx() (*sqlx.DB, error) {
+	gdb, err := c.getConn(c.cfg.DSN())
+	if err != nil {
+		return nil, err
+	}
+	db, err := gdb.DB()
+	if err != nil {
+		return nil, err
+	}
+	return sqlx.NewDb(db, "mysql"), nil
 }

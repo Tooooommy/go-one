@@ -20,22 +20,6 @@ type Conf struct {
 	TablePrefix     string        `json:"table_prefix"`
 }
 
-func DefaultConf() *Conf {
-	return &Conf{
-		Username:        "root",
-		Password:        "root",
-		Database:        "master",
-		Address:         "127.0.0.1:3306",
-		Charset:         "utf8mb4",
-		Loc:             "Local",
-		Timeout:         10,
-		MaxOpenConns:    64,
-		MaxIdleConns:    64,
-		ConnMaxLifetime: 60,
-		ConnMaxIdleTime: 60,
-	}
-}
-
 func (cfg *Conf) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=%s&timeout=%ds",
 		cfg.Username, cfg.Password, cfg.Address, cfg.Database, cfg.Charset, cfg.Loc, cfg.Timeout)

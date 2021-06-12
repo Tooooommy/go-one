@@ -63,7 +63,8 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gorm.io/driver/mysql v1.1.0
-	gorm.io/gorm v1.21.9
+	gorm.io/gorm v1.21.10
+	gorm.io/plugin/opentracing v0.0.0-20210506132430-24a9caea7709 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 

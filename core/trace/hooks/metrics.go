@@ -3,17 +3,16 @@ package hooks
 import (
 	"github.com/Tooooommy/go-one/core/metrics"
 	kmetrics "github.com/go-kit/kit/metrics"
-	xmetrics "github.com/uber/jaeger-lib/metrics"
+	jaegercfg "github.com/uber/jaeger-client-go/config"
 	xkit "github.com/uber/jaeger-lib/metrics/go-kit"
 )
 
-func NewFactory(namespace string, metrics *metrics.Metrics) xmetrics.Factory {
-	return xkit.Wrap(namespace, &factory{metrics: metrics})
+func NewMetrics(metrics metrics.Metrics) jaegercfg.Option {
+	return jaegercfg.Metrics(xkit.Wrap(metrics.Namespace(), &factory{metrics: metrics}))
 }
 
 type factory struct {
-	metrics *metrics.Metrics
-	buckets int
+	metrics metrics.Metrics
 }
 
 func (f *factory) Counter(name string) kmetrics.Counter {
