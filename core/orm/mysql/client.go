@@ -12,13 +12,14 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-// client
 type (
+	// Client
 	Client interface {
 		Conn() (*gorm.DB, error)
 		Connx() (*sqlx.DB, error)
 	}
 
+	// client
 	client struct {
 		cfg *Conf
 	}
